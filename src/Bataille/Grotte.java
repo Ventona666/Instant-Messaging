@@ -63,10 +63,10 @@ public class Grotte {
 	}
 	
 	public Salle salleSuivante(Salle salleAQuitter) {
-		List<Salle> listeSalle = planGrotte.get(salleAQuitter);
+		List<Salle> listeSalle = new ArrayList<>(planGrotte.get(salleAQuitter));
 		listeSalle.removeAll(sallesExplorees);
 		if (listeSalle.isEmpty()) {
-			listeSalle.addAll(sallesExplorees);
+			listeSalle.addAll(planGrotte.get(salleAQuitter));
 		}
 		Random randomGenerateur = new Random();
 		int indiceSalleAExplorer = randomGenerateur.nextInt(listeSalle.size());

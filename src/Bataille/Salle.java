@@ -23,4 +23,9 @@ public class Salle {
 	public ZoneDeCombat getZoneDeCombat() {
 		return zoneDeCombat;
 	}
+	
+	@Override
+	public int hashCode() {
+		return 31*numSalle+(31*31)*zoneDeCombat.hashCode();
+	}
 }
