@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d82e8393-6995-42e2-aba1-30e9a0b13226" name="Default Changelist" comment="first commit">
+      <change beforePath="$PROJECT_DIR$/fantaisieTP5.iml" beforeDir="false" afterPath="$PROJECT_DIR$/fantaisieTP5.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fantaisieTP5.iws" beforeDir="false" afterPath="$PROJECT_DIR$/fantaisieTP5.iws" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -126,7 +127,14 @@
       <option name="project" value="LOCAL" />
       <updated>1636650590590</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="first commit">
+      <created>1636650968945</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1636650968945</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
