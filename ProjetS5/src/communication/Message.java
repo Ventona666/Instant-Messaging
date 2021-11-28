@@ -3,7 +3,7 @@ package communication;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Message implements Serializable {
+public class Message implements Serializable, Comparable<Message> {
     private final int id;
     private final Date date;
     private final int idSender;
@@ -40,5 +40,15 @@ public class Message implements Serializable {
                 ", idSender=" + idSender +
                 ", text='" + text + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Message message) {
+        if(date.before(message.getDate())){
+            return -1;
+        }
+        else{
+            return 1;
+        }
     }
 }

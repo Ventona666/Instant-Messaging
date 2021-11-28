@@ -1,8 +1,11 @@
 package communication;
 
+import java.util.NavigableSet;
+import java.util.TreeSet;
+
 public class Thread {
     private final int id;
-    private String[] messageList;
+    private NavigableSet<Message> messageList = new TreeSet<>();
 
     public Thread(int id){
         this.id = id;
@@ -12,11 +15,11 @@ public class Thread {
         return id;
     }
 
-    public String[] getMessageList() {
+    public NavigableSet<Message> getMessageList() {
         return messageList;
     }
 
-    public void setMessageList(String[] messageList) {
+    public void setMessageList(NavigableSet<Message> messageList) {
         this.messageList = messageList;
     }
 }
