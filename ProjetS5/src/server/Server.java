@@ -30,6 +30,6 @@ public class Server implements Communication {
 
     @Override
     public Message sendMessage(String text, int idThread) throws RemoteException {
-        return new Message(0, new Date(), 0,text);
+        return new Message(0, new Date(), null,text);
     }
 }

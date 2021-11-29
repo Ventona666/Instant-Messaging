@@ -7,7 +7,7 @@ public class User implements Comparable<User> {
     private int id;
     private final String firstName;
     private final String lastName;
-    private NavigableSet<Group> groupList = new TreeSet<Group>();
+    private NavigableSet<Group> groupList = new TreeSet<>();
 
     public User(String firstName, String lastName){
         this.firstName = firstName;
@@ -28,6 +28,10 @@ public class User implements Comparable<User> {
 
     public NavigableSet<Group> getGroupList() {
         return groupList;
+    }
+
+    public boolean addGroup(Group groupToAdd){
+        return groupList.add(groupToAdd);
     }
 
     @Override

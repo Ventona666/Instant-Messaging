@@ -1,18 +1,20 @@
 package communication;
 
+import Client.User;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class Message implements Serializable, Comparable<Message> {
     private final int id;
     private final Date date;
-    private final int idSender;
+    private final User sender;
     private final String text;
 
-    public Message(int id, Date date, int idSender, String text){
+    public Message(int id, Date date, User sender, String text){
         this.id = id;
         this.date = date;
-        this.idSender = idSender;
+        this.sender = sender;
         this.text = text;
     }
 
@@ -28,8 +30,8 @@ public class Message implements Serializable, Comparable<Message> {
         return text;
     }
 
-    public int getIdSender() {
-        return idSender;
+    public User getSender() {
+        return sender;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class Message implements Serializable, Comparable<Message> {
         return "Message{" +
                 "id=" + id +
                 ", date=" + date +
-                ", idSender=" + idSender +
+                ", idSender=" + sender +
                 ", text='" + text + '\'' +
                 '}';
     }

@@ -17,6 +17,10 @@ public class Group implements Comparable<Group>{
         return userList;
     }
 
+    public boolean addUser(User userToAdd){
+        return userList.add(userToAdd);
+    }
+
     @Override
     public int compareTo(Group group) {
         if(id < group.getId()){
