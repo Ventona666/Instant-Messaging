@@ -10,12 +10,18 @@ public class Message implements Serializable, Comparable<Message> {
     private final Date date;
     private final User sender;
     private final String text;
+    private final Thread thread;
 
-    public Message(int id, Date date, User sender, String text){
+    public Message(int id, Date date, User sender, String text, Thread thread){
         this.id = id;
         this.date = date;
         this.sender = sender;
         this.text = text;
+        this.thread = thread;
+    }
+
+    public Thread getThread() {
+        return thread;
     }
 
     public int getId() {

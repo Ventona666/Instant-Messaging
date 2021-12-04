@@ -8,7 +8,11 @@ import java.util.TreeSet;
 public class Group implements Comparable<Group>{
     private int id;
     private NavigableSet<User> userList = new TreeSet<>();
+    private NavigableSet<Thread> threadList = new TreeSet<>();
 
+    public Group(int id){
+        this.id = id;
+    }
     public int getId() {
         return id;
     }

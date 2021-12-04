@@ -15,8 +15,7 @@ public class Client {
         try {
             Registry registry = LocateRegistry.getRegistry(5099);
             Communication stub = (Communication) registry.lookup("Message");
-            Message response = stub.sendMessage("Salut je m'appelle Omega !", 0);
-            System.out.println("response: " + response);
+            stub.sendMessage("Salut je m'appelle Omega !", 0);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

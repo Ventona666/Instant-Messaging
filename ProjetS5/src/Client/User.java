@@ -1,9 +1,10 @@
 package Client;
 
+import java.io.Serializable;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
-public class User implements Comparable<User> {
+public class User implements Serializable, Comparable<User> {
     private int id;
     private final String firstName;
     private final String lastName;
