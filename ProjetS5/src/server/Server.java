@@ -9,13 +9,11 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Date;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Server implements ServerInterface {
     private final int port;
-    private NavigableSet<User> userSet = new TreeSet<>();
+    private Map<User, ClientInterface> userMap = new HashMap<>();
 
     public Server(int port){
         this.port = port;
@@ -37,11 +35,10 @@ public class Server implements ServerInterface {
 
     @Override
     public void register(User user) throws RemoteException {
-        userSet.add(user);
         try{
             Registry registry = LocateRegistry.getRegistry(user.getIpAddress(), 5098);
-            ClientInterface stub = (ClientInterface) registry.lookup("ClientInterface");
-            stub.ping();
+            ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
+            userMap.put(user, stubClient);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
@@ -50,7 +47,7 @@ public class Server implements ServerInterface {
 
     @Override
     public void unregister(User user) throws RemoteException {
-        userSet.remove(user);
+        userMap.remove(user);
     }
 
     @Override
