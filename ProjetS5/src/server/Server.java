@@ -1,5 +1,6 @@
 package server;
 
+import Client.Group;
 import Client.User;
 import communication.ServerInterface;
 import communication.Message;
@@ -13,7 +14,7 @@ import java.util.*;
 
 public class Server implements ServerInterface {
     private final int port;
-    private Map<User, ClientInterface> userMap = new HashMap<>();
+    private Map<User, ClientInterface> connectedUsersMap = new HashMap<>();
 
     public Server(int port){
         this.port = port;
@@ -38,7 +39,9 @@ public class Server implements ServerInterface {
         try{
             Registry registry = LocateRegistry.getRegistry(user.getIpAddress(), 5098);
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
-            userMap.put(user, stubClient);
+            connectedUsersMap.put(user, stubClient);
+            NavigableSet<Group> groupList = getGroupList(user);
+            stubClient.update(groupList);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
@@ -47,17 +50,20 @@ public class Server implements ServerInterface {
 
     @Override
     public void unregister(User user) throws RemoteException {
-        userMap.remove(user);
+        connectedUsersMap.remove(user);
     }
 
     @Override
-    public void sendMessage(String text, int idThread) throws RemoteException {
+    public void sendMessage(User sender, String text, int idThread) throws RemoteException {
+        Message message = new Message(0, new Date(), sender, text, null);
         System.out.println(new Message(0, new Date(), null,text, null));
     }
 
     @Override
     public void hasRead(User user, int idMessage) throws RemoteException {
-
+        User sender = getMessage(idMessage).getSender();
+        ClientInterface stubSender = connectedUsersMap.get(sender);
+        stubSender.messageReceive();
     }
 
     @Override
@@ -67,6 +73,24 @@ public class Server implements ServerInterface {
 
     @Override
     public void hasReceived(User user, int idMessage) throws RemoteException {
-
+        User sender = getMessage(idMessage).getSender();
+        ClientInterface stubSender = connectedUsersMap.get(sender);
+        stubSender.messageReceive();
     }
+
+    public Thread getThread(int idThread){
+        // méthode qui cherche l'information dans la bdd
+        return null;
+    }
+
+    public Message getMessage(int idMessage){
+        // méthode qui cherche l'information dans la bdd
+        return null;
+    }
+
+    public NavigableSet<Group> getGroupList(User user){
+        // méthode qui cherche l'information dans la bdd
+        return null;
+    }
+
 }
