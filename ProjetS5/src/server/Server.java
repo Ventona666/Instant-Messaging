@@ -1,8 +1,7 @@
 package server;
 
-import Client.Client;
 import Client.User;
-import communication.Communication;
+import communication.ServerInterface;
 import communication.Message;
 import Client.ClientInterface;
 
@@ -14,18 +13,19 @@ import java.util.Date;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
-public class Server implements Communication {
+public class Server implements ServerInterface {
     private final int port;
     private NavigableSet<User> userSet = new TreeSet<>();
 
     public Server(int port){
         this.port = port;
     }
+
     public static void main (String[] args){
         try{
             Server server = new Server(5099);
             Registry registry = LocateRegistry.createRegistry(5099);
-            Communication stub = (Communication) UnicastRemoteObject.exportObject(server,5099);
+            ServerInterface stub = (ServerInterface) UnicastRemoteObject.exportObject(server,5099);
             registry.bind("Message", stub);
             System.err.println("Serveur prêt !");
         } catch (Exception e){
@@ -61,6 +61,11 @@ public class Server implements Communication {
     @Override
     public void hasRead(User user, int idMessage) throws RemoteException {
 
+    }
+
+    @Override
+    public void pong() throws RemoteException {
+        System.out.println("Client est toujours la");
     }
 
     @Override

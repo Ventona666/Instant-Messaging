@@ -1,6 +1,6 @@
 package Client;
 
-import communication.Communication;
+import communication.ServerInterface;
 import communication.Message;
 
 import java.rmi.RemoteException;
@@ -11,6 +11,8 @@ import java.util.NavigableSet;
 
 public class Client implements ClientInterface{
     private Client(){}
+    private static ServerInterface stubServer;
+    private static ClientInterface stubClient;
 
     public static void main(String[] args) {
 
@@ -18,13 +20,13 @@ public class Client implements ClientInterface{
         try {
             Client client = new Client();
             Registry registryClient = LocateRegistry.createRegistry(5098);
-            ClientInterface stubClient = (ClientInterface) UnicastRemoteObject.exportObject(client, 5098);
+            stubClient = (ClientInterface) UnicastRemoteObject.exportObject(client, 5098);
             registryClient.bind("ClientInterface", stubClient);
 
             Registry registry = LocateRegistry.getRegistry(5099);
-            Communication stub = (Communication) registry.lookup("Message");
-            stub.register(new User("tony", "defreitas", "192.168.68.102"));
-            stub.sendMessage("Salut je m'appelle Omega !", 0);
+            stubServer = (ServerInterface) registry.lookup("Message");
+            stubServer.register(new User("tony", "defreitas", "192.168.68.102"));
+            stubServer.sendMessage("Salut je m'appelle Omega !", 0);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
@@ -33,7 +35,7 @@ public class Client implements ClientInterface{
 
     @Override
     public void ping() throws RemoteException {
-        System.out.println("Ca marche !");
+        stubServer.pong();
     }
 
     @Override
