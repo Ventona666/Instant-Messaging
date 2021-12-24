@@ -10,7 +10,7 @@ public class Message implements Serializable, Comparable<Message> {
     private final String text;
     private final Thread thread;
 
-    public Message(int id, Date date, User sender, String text, Thread thread){
+    public Message(int id, Date date, User sender, String text, Thread thread) {
         this.id = id;
         this.date = date;
         this.sender = sender;
@@ -50,10 +50,9 @@ public class Message implements Serializable, Comparable<Message> {
 
     @Override
     public int compareTo(Message message) {
-        if(date.before(message.getDate())){
+        if (date.before(message.getDate())) {
             return -1;
-        }
-        else{
+        } else {
             return 1;
         }
     }
