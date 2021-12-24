@@ -1,14 +1,11 @@
-package Client;
+package client;
 
-import com.sun.source.tree.Tree;
-
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.HashSet;
 
 public class Group implements Comparable<Group>{
     private int id;
-    private NavigableSet<User> userList = new TreeSet<>();
-    private NavigableSet<Thread> threadList = new TreeSet<>();
+    private HashSet<User> userSet = new HashSet<>();
+    private HashSet<Thread> threadSet = new HashSet<>();
 
     public Group(int id){
         this.id = id;
@@ -17,12 +14,16 @@ public class Group implements Comparable<Group>{
         return id;
     }
 
-    public NavigableSet<User> getUserList() {
-        return userList;
+    public HashSet<User> getUserSet() {
+        return userSet;
     }
 
     public boolean addUser(User userToAdd){
-        return userList.add(userToAdd);
+        return userSet.add(userToAdd);
+    }
+
+    public HashSet<Thread> getThreadSet() {
+        return threadSet;
     }
 
     @Override
