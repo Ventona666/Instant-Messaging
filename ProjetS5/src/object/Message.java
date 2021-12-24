@@ -1,6 +1,4 @@
-package communication;
-
-import Client.User;
+package object;
 
 import java.io.Serializable;
 import java.util.Date;

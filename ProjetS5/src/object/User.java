@@ -1,4 +1,4 @@
-package client;
+package object;
 
 import java.io.Serializable;
 import java.util.NavigableSet;

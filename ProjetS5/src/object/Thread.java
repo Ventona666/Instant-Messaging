@@ -1,6 +1,4 @@
-package communication;
-
-import Client.Group;
+package object;
 
 import java.util.NavigableSet;
 import java.util.TreeSet;
@@ -25,6 +23,10 @@ public class Thread implements Comparable<Thread>{
 
     public void setMessageList(NavigableSet<Message> messageList) {
         this.messageList = messageList;
+    }
+
+    public void addMessageList(Message message){
+        this.messageList.add(message);
     }
 
     @Override

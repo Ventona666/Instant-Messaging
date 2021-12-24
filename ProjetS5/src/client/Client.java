@@ -1,14 +1,14 @@
 package client;
 
-import communication.ServerInterface;
-import communication.Message;
-import communication.Thread;
+import server.ServerInterface;
+import object.Thread;
+import object.Group;
+import object.User;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Date;
 import java.util.NavigableSet;
 
 public class Client implements ClientInterface{

@@ -1,6 +1,6 @@
-package communication;
+package server;
 
-import client.User;
+import object.User;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

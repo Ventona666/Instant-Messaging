@@ -1,10 +1,9 @@
 package server;
 
-import Client.Group;
-import Client.User;
-import communication.ServerInterface;
-import communication.Message;
-import Client.ClientInterface;
+import object.Group;
+import object.User;
+import object.Message;
+import client.ClientInterface;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
