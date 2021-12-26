@@ -25,6 +25,7 @@ public class Server implements ServerInterface {
 
     public static void main(String[] args) {
         try {
+            System.setProperty("java.rmi.server.hostname", "192.168.68.102"); //avec adresse IP du serveur
             Server server = new Server(5099);
             Registry registry = LocateRegistry.createRegistry(5099);
             ServerInterface stub = (ServerInterface) UnicastRemoteObject.exportObject(server, 5099);
@@ -39,13 +40,15 @@ public class Server implements ServerInterface {
     @Override
     public void register(User user) throws RemoteException {
         try {
-            System.out.println(RemoteServer.getClientHost());
-            Registry registry = LocateRegistry.getRegistry(user.getIpAddress(), 5098);
+            String host = RemoteServer.getClientHost();
+            System.out.println(host);
+            Registry registry = LocateRegistry.getRegistry(host, 5098);
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
             connectedUsersMap.put(user, stubClient);
-            NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupList();
-            stubClient.update(groupList);
-            System.out.println();
+            stubClient.ping();
+            //NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupList();
+            //stubClient.update(groupList);
+
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();

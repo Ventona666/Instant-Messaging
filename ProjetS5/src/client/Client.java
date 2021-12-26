@@ -21,13 +21,14 @@ public class Client implements ClientInterface{
     public static void main(String[] args) {
         String host = (args.length < 1) ? null : args[0];
         try {
+            System.setProperty("java.rmi.server.hostname", "192.168.68.102"); // avec adresse IP du client
             Client client = new Client();
             Registry registryClient = LocateRegistry.createRegistry(5098);
             stubClient = (ClientInterface) UnicastRemoteObject.exportObject(client, 5098);
             registryClient.bind("ClientInterface", stubClient);
-            Registry registry = LocateRegistry.getRegistry(5099);
+            Registry registry = LocateRegistry.getRegistry("192.168.68.102", 5099);
             stubServer = (ServerInterface) registry.lookup("Message");
-            stubServer.register(new User("tony", "defreitas", "192.168.68.102"));
+            stubServer.register(new User("tony", "defreitas", "192.168.68.103"));
             stubServer.sendMessage(null, "Salut je m'appelle Omega !", 0);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
