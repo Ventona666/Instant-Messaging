@@ -8,13 +8,11 @@ public class User implements Serializable, Comparable<User> {
     private int id;
     private final String firstName;
     private final String lastName;
-    private String ipAddress;
     private NavigableSet<Group> groupList = new TreeSet<>();
 
-    public User(String firstName, String lastName, String ipAddress){
+    public User(String firstName, String lastName){
         this.firstName = firstName;
         this.lastName = lastName;
-        this.ipAddress = ipAddress;
     }
 
     public int getId() {
@@ -23,10 +21,6 @@ public class User implements Serializable, Comparable<User> {
 
     public String getFirstName() {
         return firstName;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
     }
 
     public String getLastName() {

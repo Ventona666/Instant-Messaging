@@ -5,35 +5,51 @@ import object.Thread;
 import object.Group;
 import object.User;
 
+import java.net.Inet4Address;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.RemoteServer;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.NavigableSet;
 
 public class Client implements ClientInterface{
-    private Client(){}
     private User user;
+    private static final int clientPort = 5098;
+    private static final int serverPort = 5099;
+    private static final String serverIp = "192.168.68.102"; // A changer selon le serveur utilisé
     private static ServerInterface stubServer;
     private static ClientInterface stubClient;
 
-    public static void main(String[] args) {
-        String host = (args.length < 1) ? null : args[0];
+    private static void connectingToServer(){
         try {
-            System.setProperty("java.rmi.server.hostname", "192.168.68.102"); // avec adresse IP du client
-            Client client = new Client();
-            Registry registryClient = LocateRegistry.createRegistry(5098);
-            stubClient = (ClientInterface) UnicastRemoteObject.exportObject(client, 5098);
-            registryClient.bind("ClientInterface", stubClient);
-            Registry registry = LocateRegistry.getRegistry("192.168.68.102", 5099);
-            stubServer = (ServerInterface) registry.lookup("Message");
-            stubServer.register(new User("tony", "defreitas", "192.168.68.103"));
-            stubServer.sendMessage(null, "Salut je m'appelle Omega !", 0);
-        } catch (Exception e) {
+            Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
+            stubServer = (ServerInterface) registry.lookup("ServerInterface");
+            stubServer.register(new User("tony", "defreitas"));
+            System.err.println("Client connecté au serveur avec succès" +
+                    "\n\tAdresse Ip client : " + Inet4Address.getLocalHost().getHostAddress() +
+                    "\n\t");
+        }
+        catch (Exception e){
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
         }
+    }
+
+    private static void bootingClientRegistry(){
+        try{
+            Registry registryClient = LocateRegistry.createRegistry(clientPort);
+            stubClient = (ClientInterface) UnicastRemoteObject.exportObject(new Client(), clientPort);
+            registryClient.bind("ClientInterface", stubClient);
+            System.err.println("Interface client activée\n");
+        }
+        catch (Exception e){
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+    public static void main(String[] args) {
+        bootingClientRegistry();
+        connectingToServer();
     }
 
     @Override
