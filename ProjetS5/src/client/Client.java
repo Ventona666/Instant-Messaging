@@ -8,11 +8,13 @@ import object.User;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RemoteServer;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.NavigableSet;
 
 public class Client implements ClientInterface{
     private Client(){}
+    private User user;
     private static ServerInterface stubServer;
     private static ClientInterface stubClient;
 
@@ -23,7 +25,6 @@ public class Client implements ClientInterface{
             Registry registryClient = LocateRegistry.createRegistry(5098);
             stubClient = (ClientInterface) UnicastRemoteObject.exportObject(client, 5098);
             registryClient.bind("ClientInterface", stubClient);
-
             Registry registry = LocateRegistry.getRegistry(5099);
             stubServer = (ServerInterface) registry.lookup("Message");
             stubServer.register(new User("tony", "defreitas", "192.168.68.102"));

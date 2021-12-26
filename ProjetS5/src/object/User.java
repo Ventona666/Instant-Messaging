@@ -50,4 +50,9 @@ public class User implements Serializable, Comparable<User> {
             return 1;
         }
     }
+    /*
+    @Override
+    public int hashCode(){
+        return 31 *
+    }*/
 }

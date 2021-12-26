@@ -8,6 +8,7 @@ import client.ClientInterface;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RemoteServer;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
@@ -38,11 +39,13 @@ public class Server implements ServerInterface {
     @Override
     public void register(User user) throws RemoteException {
         try {
+            System.out.println(RemoteServer.getClientHost());
             Registry registry = LocateRegistry.getRegistry(user.getIpAddress(), 5098);
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
             connectedUsersMap.put(user, stubClient);
             NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupList();
             stubClient.update(groupList);
+            System.out.println();
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
