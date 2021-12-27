@@ -1,5 +1,6 @@
 package client;
 
+import object.Message;
 import object.Thread;
 import object.Group;
 
@@ -12,6 +13,6 @@ public interface ClientInterface extends Remote {
     void messageReceive() throws RemoteException;
     void messageSendToUsers() throws RemoteException;
     void messageReadByUsers() throws RemoteException;
-    void inCommingMessage(Thread thread) throws RemoteException;
+    void inCommingMessage(Message message) throws RemoteException;
     void update(NavigableSet<Group> groupList) throws RemoteException;
 }

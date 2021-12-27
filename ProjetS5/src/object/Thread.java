@@ -1,26 +1,28 @@
 package object;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
 public class Thread implements Comparable<Thread> {
     private final int id;
-    private Group group;
     private final String title;
+    private HashSet<Group> groupSet = new HashSet<>();
     private NavigableSet<Message> messageList = new TreeSet<>();
 
-    public Thread(int id, Group group, String title) {
+    public Thread(int id, String title, Group... groups) {
         this.id = id;
-        this.group = group;
         this.title = title;
+        this.groupSet.addAll(Arrays.asList(groups));
     }
 
     public int getId() {
         return id;
     }
 
-    public Group getGroup() {
-        return group;
+    public HashSet<Group> getGroupSet() {
+        return groupSet;
     }
 
     public NavigableSet<Message> getMessageList() {

@@ -70,14 +70,29 @@ public class Server implements ServerInterface {
     public void sendMessage(User sender, String text, int idThread) throws RemoteException {
         Thread thread = database.getThread(idThread);
         Message message = new Message(0, new Date(), sender, text, thread);
-        System.out.println(new Message(0, new Date(), null, text, null));
+
+        //TODO méthode pour replace le thread dans la bdd
+
+        for(Group group : thread.getGroupSet()){
+            for(User user : group.getUserSet()){
+                if(connectedUsersMap.containsKey(user)){
+                    try {
+                        connectedUsersMap.get(user).inCommingMessage(message);
+                        message.incrementNumberOfReceptions();
+                    }
+                    catch (Exception e){
+                        System.err.println("Envoi du message impossible à un client" + e);
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void hasRead(User user, int idMessage) throws RemoteException {
-        User sender = database.getMessage(idMessage).getSender();
-        ClientInterface stubSender = connectedUsersMap.get(sender);
-        stubSender.messageReceive();
+        Message message = database.getMessage(idMessage);
+        message.incrementNumberOfReads();
     }
 
     @Override

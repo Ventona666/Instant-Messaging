@@ -1,5 +1,6 @@
 package client;
 
+import object.Message;
 import server.ServerInterface;
 import object.Thread;
 import object.Group;
@@ -75,7 +76,7 @@ public class Client implements ClientInterface{
     }
 
     @Override
-    public void inCommingMessage(Thread thread) throws RemoteException {
+    public void inCommingMessage(Message message) throws RemoteException {
 
 
     }
