@@ -73,14 +73,6 @@ public class Server implements ServerInterface {
         System.out.println(new Message(0, new Date(), null, text, null));
     }
 
-    /* UNUSED
-    @Override
-    public void hasReceived(User user, int idMessage) throws RemoteException {
-        User sender = database.getMessage(idMessage).getSender();
-        ClientInterface stubSender = connectedUsersMap.get(sender);
-        stubSender.messageReceive();
-    } */
-
     @Override
     public void hasRead(User user, int idMessage) throws RemoteException {
         User sender = database.getMessage(idMessage).getSender();
@@ -102,6 +94,31 @@ public class Server implements ServerInterface {
 
     @Override
     public void addThread(String title, Group group) throws RemoteException {
+
+    }
+
+    @Override
+    public void deleteThread(int idThread) throws RemoteException {
+
+    }
+
+    @Override
+    public String createAccount(String firstName, String lastName, String password1, String password2) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public void deleteAccount(String userName, String password) throws RemoteException {
+
+    }
+
+    @Override
+    public void addToGroup(User user, Group group) throws RemoteException {
+
+    }
+
+    @Override
+    public void removeFromGroup(User user, Group group) throws RemoteException {
 
     }
 }
