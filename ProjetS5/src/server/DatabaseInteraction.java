@@ -9,7 +9,7 @@ import java.util.NavigableSet;
 import object.Group;
 import object.Message;
 import object.User;
-
+import object.Thread;
 public class DatabaseInteraction {
 
     static final String DB_URL = "jdbc:mysql://51.77.148.156/projet";

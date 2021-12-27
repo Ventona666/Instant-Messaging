@@ -44,9 +44,9 @@ public class User implements Serializable, Comparable<User> {
             return 1;
         }
     }
-    /*
+
     @Override
     public int hashCode(){
-        return 31 *
-    }*/
+        return 31 * id * firstName.hashCode() * lastName.hashCode();
+    }
 }

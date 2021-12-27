@@ -5,12 +5,14 @@ import java.util.TreeSet;
 
 public class Thread implements Comparable<Thread> {
     private final int id;
-    private NavigableSet<Message> messageList = new TreeSet<>();
     private Group group;
+    private final String title;
+    private NavigableSet<Message> messageList = new TreeSet<>();
 
-    public Thread(int id, Group group) {
+    public Thread(int id, Group group, String title) {
         this.id = id;
         this.group = group;
+        this.title = title;
     }
 
     public int getId() {
@@ -39,5 +41,10 @@ public class Thread implements Comparable<Thread> {
             return -1;
         }
         return 1;
+    }
+
+    @Override
+    public int hashCode(){
+        return 31 * id * title.hashCode();
     }
 }

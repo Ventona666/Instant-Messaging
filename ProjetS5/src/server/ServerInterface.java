@@ -1,5 +1,6 @@
 package server;
 
+import object.Group;
 import object.User;
 
 import java.rmi.Remote;
@@ -12,4 +13,10 @@ public interface ServerInterface extends Remote {
     /* UNUSED void hasReceived(User user, int idMessage) throws RemoteException; */
     void hasRead(User user, int idMessage) throws RemoteException;
     void pong() throws RemoteException;
+    void addThread(String title, Group group) throws RemoteException;
+    void deleteThread(int idThread) throws RemoteException;
+    String createAccount(String firstName, String lastName, String password1, String password2) throws RemoteException;
+    void deleteAccount(String userName, String password) throws RemoteException;
+    void addToGroup(User user, Group group) throws RemoteException;
+    void removeFromGroup(User user, Group group) throws RemoteException;
 }

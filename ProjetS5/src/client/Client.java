@@ -27,7 +27,9 @@ public class Client implements ClientInterface{
             stubServer.register(new User("tony", "defreitas"));
             System.err.println("Client connecté au serveur avec succès" +
                     "\n\tAdresse Ip client : " + Inet4Address.getLocalHost().getHostAddress() +
-                    "\n\t");
+                    "\n\tAdresse Ip serveur : " + serverIp +
+                    "\n\tPort d'entrée client : " + clientPort +
+                    "\n\tPort d'entrée serveur : " + serverPort);
         }
         catch (Exception e){
             System.err.println("Client exception: " + e.toString());
@@ -40,7 +42,7 @@ public class Client implements ClientInterface{
             Registry registryClient = LocateRegistry.createRegistry(clientPort);
             stubClient = (ClientInterface) UnicastRemoteObject.exportObject(new Client(), clientPort);
             registryClient.bind("ClientInterface", stubClient);
-            System.err.println("Interface client activée\n");
+            System.err.println("Interface client activée");
         }
         catch (Exception e){
             System.err.println("Client exception: " + e.toString());

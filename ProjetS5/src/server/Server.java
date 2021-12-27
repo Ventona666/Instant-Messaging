@@ -3,6 +3,7 @@ package server;
 import object.Group;
 import object.User;
 import object.Message;
+import object.Thread;
 import client.ClientInterface;
 
 import java.net.Inet4Address;
@@ -26,7 +27,7 @@ public class Server implements ServerInterface {
             System.err.println("Serveur lancé\n\tAdresse IP : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tPort : 5099\n");
         } catch (Exception e) {
-            System.err.println("Erreur lancement serveur :" + e);
+            System.err.println("Erreur lancement serveur : " + e);
             e.printStackTrace();
         }
     }
@@ -34,11 +35,14 @@ public class Server implements ServerInterface {
     @Override
     public void register(User user) throws RemoteException {
         try {
+
             String host = RemoteServer.getClientHost();
             Registry registry = LocateRegistry.getRegistry(host, 5098);
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
+
+            stubClient.ping();
             connectedUsersMap.put(user, stubClient);
-            stubClient.ping(); // TODO à supprimer une fois la phase de test terminée
+
             //NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupList();
             //stubClient.update(groupList);
 
@@ -51,11 +55,21 @@ public class Server implements ServerInterface {
     @Override
     public void unregister(User user) throws RemoteException {
         connectedUsersMap.remove(user);
+        System.err.println("Un client s'est déconnecté\n");
+        try{
+            String clientIp = RemoteServer.getClientHost();
+            System.err.println("\tAdresse IP : " + clientIp);
+        }
+        catch(Exception e){
+            System.err.println("\tAdresse IP : " + e);
+        }
+
     }
 
     @Override
     public void sendMessage(User sender, String text, int idThread) throws RemoteException {
-        Message message = new Message(0, new Date(), sender, text, null);
+        Thread thread = database.getThread(idThread);
+        Message message = new Message(0, new Date(), sender, text, thread);
         System.out.println(new Message(0, new Date(), null, text, null));
     }
 
@@ -76,9 +90,18 @@ public class Server implements ServerInterface {
 
     @Override
     public void pong() throws RemoteException {
-        System.out.println("Client est toujours la");
+        try{
+            String clientIp = RemoteServer.getClientHost();
+            System.err.println("Un nouveau client est correctement connecté\n\tAdresse IP : " + clientIp);
+        }
+        catch (Exception e){
+            System.err.println("Impossible d'obtenir l'ip du client : " + e);
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    public void addThread(String title, Group group) throws RemoteException {
 
-
+    }
 }
