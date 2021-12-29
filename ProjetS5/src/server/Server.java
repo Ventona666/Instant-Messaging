@@ -12,6 +12,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class Server implements ServerInterface {
@@ -129,7 +130,17 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public User logIn(String username, String password) {
+    public User logIn(String username, String password) throws RemoteException {
+        try{
+            return database.logIn(username, password);
+        }
+        catch (NoSuchAlgorithmException noSuchAlgorithmException){
+            System.err.println("Erreur lors du hashage du mot de passe : " + noSuchAlgorithmException);
+            noSuchAlgorithmException.printStackTrace();
+        }
+        catch (ConnexionRefusedException connexionRefusedException){
+            System.err.println("Mot de passe et/ou username incorrect : " + connexionRefusedException);
+        }
         return null;
     }
 
