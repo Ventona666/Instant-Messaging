@@ -1,7 +1,6 @@
 package client;
 
 import object.*;
-import object.Thread;
 import server.ConnexionRefusedException;
 import server.ServerInterface;
 

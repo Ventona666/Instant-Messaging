@@ -1,7 +1,5 @@
 package object;
 
-import server.ServerInterface;
-
 public class staffUser extends User{
     public staffUser(int id, String firstName, String lastName) {
         super(id, firstName, lastName);
