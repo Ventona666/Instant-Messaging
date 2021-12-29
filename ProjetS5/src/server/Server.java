@@ -108,12 +108,12 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void addThread(String title, Group group) throws RemoteException {
+    public void newThread(String title, Group group) throws RemoteException {
 
     }
 
     @Override
-    public void deleteThread(int idThread) throws RemoteException {
+    public void closeThread(int idThread) throws RemoteException {
 
     }
 

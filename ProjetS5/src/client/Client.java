@@ -1,10 +1,8 @@
 package client;
 
-import object.Message;
-import server.ServerInterface;
+import object.*;
 import object.Thread;
-import object.Group;
-import object.User;
+import server.ServerInterface;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
@@ -14,7 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.NavigableSet;
 
 public class Client implements ClientInterface{
-    private User user;
+    private static User user;
     private static final int clientPort = 5098;
     private static final int serverPort = 5099;
     private static final String serverIp = "192.168.68.102"; // A changer selon le serveur utilisé
@@ -25,7 +23,7 @@ public class Client implements ClientInterface{
         try {
             Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
             stubServer = (ServerInterface) registry.lookup("ServerInterface");
-            stubServer.register(new User("tony", "defreitas"));
+            stubServer.register(new campusUser(5,"tony", "defreitas"));
             System.err.println("Client connecté au serveur avec succès" +
                     "\n\tAdresse Ip client : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tAdresse Ip serveur : " + serverIp +
