@@ -8,21 +8,31 @@ import java.util.TreeSet;
 public class Thread implements Comparable<Thread> {
     private final int id;
     private final String title;
-    private HashSet<Group> groupSet = new HashSet<>();
+    private final User owner;
+    private final Group group;
     private NavigableSet<Message> messageList = new TreeSet<>();
 
-    public Thread(int id, String title, Group... groups) {
+    public Thread(int id, String title, User owner, Group group) {
         this.id = id;
         this.title = title;
-        this.groupSet.addAll(Arrays.asList(groups));
+        this.owner = owner;
+        this.group = group;
     }
 
     public int getId() {
         return id;
     }
 
-    public HashSet<Group> getGroupSet() {
-        return groupSet;
+    public String getTitle() {
+        return title;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public Group getGroup() {
+        return group;
     }
 
     public NavigableSet<Message> getMessageList() {

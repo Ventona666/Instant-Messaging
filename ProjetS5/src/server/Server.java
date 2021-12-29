@@ -63,7 +63,6 @@ public class Server implements ServerInterface {
         catch(Exception e){
             System.err.println("\tAdresse IP : " + e);
         }
-
     }
 
     @Override
@@ -71,19 +70,21 @@ public class Server implements ServerInterface {
         Thread thread = database.getThread(idThread);
         Message message = new Message(0, new Date(), sender, text, thread);
 
+        /// Création d'un groupe virtuel afin d'envoyer le message à tout les users du thread
+        Group virtualGroup = thread.getGroup();
+        virtualGroup.addUser(thread.getOwner());
+
         //TODO méthode pour replace le thread dans la bdd
 
-        for(Group group : thread.getGroupSet()){
-            for(User user : group.getUserSet()){
-                if(connectedUsersMap.containsKey(user)){
-                    try {
-                        connectedUsersMap.get(user).inCommingMessage(message);
-                        message.incrementNumberOfReceptions();
-                    }
-                    catch (Exception e){
-                        System.err.println("Envoi du message impossible à un client" + e);
-                        e.printStackTrace();
-                    }
+        for(User user : virtualGroup.getUserSet()){
+            if(connectedUsersMap.containsKey(user)){
+                try {
+                    connectedUsersMap.get(user).inCommingMessage(message);
+                    message.incrementNumberOfReceptions();
+                }
+                catch (Exception e){
+                    System.err.println("Envoi du message impossible à un client" + e);
+                    e.printStackTrace();
                 }
             }
         }
@@ -124,6 +125,16 @@ public class Server implements ServerInterface {
 
     @Override
     public void deleteAccount(String userName, String password) throws RemoteException {
+
+    }
+
+    @Override
+    public User logIn(String username, String password) {
+        return null;
+    }
+
+    @Override
+    public void logOut() {
 
     }
 

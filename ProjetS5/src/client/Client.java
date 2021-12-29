@@ -2,6 +2,7 @@ package client;
 
 import object.*;
 import object.Thread;
+import server.ConnexionRefusedException;
 import server.ServerInterface;
 
 import java.net.Inet4Address;
@@ -12,7 +13,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.NavigableSet;
 
 public class Client implements ClientInterface{
-    private static User user;
+    private static User user = null;
     private static final int clientPort = 5098;
     private static final int serverPort = 5099;
     private static final String serverIp = "192.168.68.102"; // A changer selon le serveur utilisé
@@ -21,6 +22,7 @@ public class Client implements ClientInterface{
 
     private static void connectingToServer(){
         try {
+            // Connexion au serveur
             Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
             stubServer = (ServerInterface) registry.lookup("ServerInterface");
             stubServer.register(new campusUser(5,"tony", "defreitas"));
@@ -29,6 +31,9 @@ public class Client implements ClientInterface{
                     "\n\tAdresse Ip serveur : " + serverIp +
                     "\n\tPort d'entrée client : " + clientPort +
                     "\n\tPort d'entrée serveur : " + serverPort);
+
+            // Connexion au compte de l'utilisateur
+            logIn();
         }
         catch (Exception e){
             System.err.println("Client exception: " + e.toString());
@@ -48,6 +53,35 @@ public class Client implements ClientInterface{
             e.printStackTrace();
         }
     }
+
+    private static void logIn(){
+        SignInInterface signInInterface= new SignInInterface();
+        signInInterface.build();
+
+        String username = " ";
+        String password = " ";
+
+        try {
+            user = stubServer.logIn(username, password);
+            System.err.println("Connexion au compte de l'utilisateur réussi");
+        }
+        catch (ConnexionRefusedException connexionRefusedException){
+            System.err.println(connexionRefusedException + " : Username et/ou mot de passe incorrect(s)");
+        }
+        catch (Exception e){
+            System.err.println("Erreur lors de la tentative de connexion : " + e);
+            e.printStackTrace();
+        }
+    }
+
+    private void logOut(){
+        //TODO fermer l'interface graphique du client
+        user = null;
+
+        //Ré ouverture de l'interface de connexion
+        logIn();
+    }
+
     public static void main(String[] args) {
         bootingClientRegistry();
         connectingToServer();
