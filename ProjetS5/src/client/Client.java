@@ -24,7 +24,7 @@ public class Client implements ClientInterface{
             // Connexion au serveur
             Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
             stubServer = (ServerInterface) registry.lookup("ServerInterface");
-            stubServer.register(new campusUser(5,"tony", "defreitas"));
+            stubServer.register(new CampusUser("tony", "defreitas"));
             System.err.println("Client connecté au serveur avec succès" +
                     "\n\tAdresse Ip client : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tAdresse Ip serveur : " + serverIp +
@@ -92,7 +92,7 @@ public class Client implements ClientInterface{
     }
 
     @Override
-    public void messageReceive() throws RemoteException {
+    public void messageReceive(Message message) throws RemoteException {
 
     }
 

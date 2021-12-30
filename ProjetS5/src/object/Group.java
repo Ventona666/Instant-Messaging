@@ -1,18 +1,21 @@
 package object;
 
+
 import java.util.HashSet;
+import static utils.IdGenerator.idGenerator;
 
 public class Group implements Comparable<Group> {
-    private final int id;
+    private final long id;
     private String name;
     private HashSet<User> userSet = new HashSet<>();
     private HashSet<Thread> threadSet = new HashSet<>();
 
-    public Group(int id) {
-        this.id = id;
+    public Group(String name) {
+        this.id = idGenerator(name);
+        this.name = name;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

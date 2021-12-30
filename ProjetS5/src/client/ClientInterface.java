@@ -10,7 +10,7 @@ import java.util.NavigableSet;
 
 public interface ClientInterface extends Remote {
     void ping() throws RemoteException;
-    void messageReceive() throws RemoteException;
+    void messageReceive(Message message) throws RemoteException;
     void messageSendToUsers() throws RemoteException;
     void messageReadByUsers() throws RemoteException;
     void inCommingMessage(Message message) throws RemoteException;

@@ -1,10 +1,8 @@
 package server;
 
-import object.Group;
-import object.User;
-import object.Message;
-import object.Thread;
+import object.*;
 import client.ClientInterface;
+import object.Thread;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
@@ -67,9 +65,8 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void sendMessage(User sender, String text, int idThread) throws RemoteException {
-        Thread thread = database.getThread(idThread);
-        Message message = new Message(0, new Date(), sender, text, thread);
+    public void sendMessage(Message message) throws RemoteException {
+        Thread thread = message.getThread();
 
         /// Création d'un groupe virtuel afin d'envoyer le message à tout les users du thread
         Group virtualGroup = thread.getGroup();

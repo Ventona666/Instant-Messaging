@@ -4,22 +4,23 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import static utils.IdGenerator.idGenerator;
 
 public class Thread implements Comparable<Thread> {
-    private final int id;
+    private final long id;
     private final String title;
     private final User owner;
     private final Group group;
     private NavigableSet<Message> messageList = new TreeSet<>();
 
-    public Thread(int id, String title, User owner, Group group) {
-        this.id = id;
+    public Thread(String title, User owner, Group group) {
+        this.id = idGenerator(title);
         this.title = title;
         this.owner = owner;
         this.group = group;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -57,6 +58,6 @@ public class Thread implements Comparable<Thread> {
 
     @Override
     public int hashCode(){
-        return 31 * id * title.hashCode();
+        return 31 * title.hashCode();
     }
 }

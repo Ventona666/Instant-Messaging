@@ -3,23 +3,25 @@ package object;
 import server.ServerInterface;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+import static utils.IdGenerator.idGenerator;
 
 public abstract class User implements Serializable, Comparable<User> {
-    private final int id;
+    private final long id;
     private final String firstName;
     private final String lastName;
     protected ServerInterface stubServer;
     private NavigableSet<Group> groupList = new TreeSet<>();
 
-    public User(int id, String firstName, String lastName){
-        this.id = id;
+    public User(String firstName, String lastName){
+        this.id = idGenerator(firstName, lastName);
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -43,9 +45,10 @@ public abstract class User implements Serializable, Comparable<User> {
         return groupList.add(groupToAdd);
     }
 
-    public void sendMessage(String text, int idThread){
+    public void sendMessage(String text, Thread thread){
         try {
-            stubServer.sendMessage(this, text, idThread);
+            Message message = new Message(new Date(), this, text, thread);
+            stubServer.sendMessage(message);
             System.err.println("Message envoyé au serveur avec succès");
         }
         catch (Exception e){
@@ -88,6 +91,6 @@ public abstract class User implements Serializable, Comparable<User> {
 
     @Override
     public int hashCode(){
-        return 31 * id * firstName.hashCode() * lastName.hashCode();
+        return 31 * firstName.hashCode() * lastName.hashCode();
     }
 }
