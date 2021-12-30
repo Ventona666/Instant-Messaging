@@ -41,6 +41,10 @@ public abstract class User implements Serializable, Comparable<User> {
         return groupList;
     }
 
+    public void setGroupList(NavigableSet<Group> groupList) {
+        this.groupList = groupList;
+    }
+
     public boolean addGroup(Group groupToAdd){
         return groupList.add(groupToAdd);
     }

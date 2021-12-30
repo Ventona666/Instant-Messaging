@@ -24,7 +24,8 @@ public class Client implements ClientInterface{
             // Connexion au serveur
             Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
             stubServer = (ServerInterface) registry.lookup("ServerInterface");
-            stubServer.register(new CampusUser("tony", "defreitas"));
+            user = new CampusUser("tony", "defreitas");
+            stubServer.register(user); // TODO pas normal de se connecter avec un user, associé stubClient et user directement
             System.err.println("Client connecté au serveur avec succès" +
                     "\n\tAdresse Ip client : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tAdresse Ip serveur : " + serverIp +
@@ -92,11 +93,6 @@ public class Client implements ClientInterface{
     }
 
     @Override
-    public void messageReceive(Message message) throws RemoteException {
-
-    }
-
-    @Override
     public void messageSendToUsers() throws RemoteException {
 
     }
@@ -114,6 +110,6 @@ public class Client implements ClientInterface{
 
     @Override
     public void update(NavigableSet<Group> groupList) throws RemoteException {
-
+        user.setGroupList(groupList);
     }
 }
