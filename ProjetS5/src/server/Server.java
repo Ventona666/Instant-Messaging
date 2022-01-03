@@ -107,23 +107,33 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void newThread(String title, Group group) throws RemoteException {
-
+    public void newThread(Thread thread) throws RemoteException {
+        //TODO update Bdd
     }
 
     @Override
     public void closeThread(int idThread) throws RemoteException {
-
+        Thread thread = database.getThread(idThread);
+        thread.closeThread();
+        //TODO update bdd
     }
 
     @Override
     public String createAccount(String firstName, String lastName, String password1, String password2) throws RemoteException {
-        return null;
+        //Generation du pseudo
+        char[] twoChars = new char[2];
+        lastName.getChars(0,2, twoChars, 0);
+        String username = firstName + twoChars[0] + twoChars[1];
+
+        // TODO envoi des elements dans la bdd
+
+
+        return username;
     }
 
     @Override
     public void deleteAccount(String userName, String password) throws RemoteException {
-
+        //TODO suppression dans la bdd
     }
 
     @Override
@@ -142,17 +152,19 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void logOut() {
-
+    public void logOut(User user) throws RemoteException{
+        connectedUsersMap.remove(user);
     }
 
     @Override
     public void addToGroup(User user, Group group) throws RemoteException {
-
+        group.addUser(user);
+        //TODO update du groupe dans la bdd
     }
 
     @Override
     public void removeFromGroup(User user, Group group) throws RemoteException {
-
+        group.removeUser(user);
+        //TODO update du groupe dans la bdd
     }
 }

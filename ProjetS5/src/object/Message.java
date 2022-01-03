@@ -57,6 +57,10 @@ public class Message implements Serializable, Comparable<Message> {
         return messageStatus;
     }
 
+    public void setMessageStatus(MessageStatus messageStatus) {
+        this.messageStatus = messageStatus;
+    }
+
     public void incrementNumberOfReceptions(){
         numberOfReceptions++;
         if(numberOfReceptions == this.thread.getGroup().getUserSet().size() + 1){

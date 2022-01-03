@@ -1,6 +1,7 @@
 package client;
 
 import object.*;
+import object.Thread;
 import server.ConnexionRefusedException;
 import server.ServerInterface;
 
@@ -9,6 +10,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashSet;
 import java.util.NavigableSet;
 
 public class Client implements ClientInterface{
@@ -76,6 +78,15 @@ public class Client implements ClientInterface{
 
     private void logOut(){
         //TODO fermer l'interface graphique du client
+
+        try {
+            stubServer.logOut(user);
+        }
+        catch (Exception e){
+            System.err.println("Erreur lors de la deconnexion au serveur : " + e);
+            e.printStackTrace();
+        }
+
         user = null;
 
         //Ré ouverture de l'interface de connexion
@@ -89,27 +100,48 @@ public class Client implements ClientInterface{
 
     @Override
     public void ping() throws RemoteException {
-        stubServer.pong();
+        try {
+            stubServer.pong();
+        }
+        catch (Exception e){
+            System.err.println("Le serveur ne répond pas : " + e);
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void messageSendToUsers() throws RemoteException {
-
+    public void messageSendToAllUsers(Message message) throws RemoteException {
+        message.setMessageStatus(MessageStatus.RECEIVED_BY_ALL_USERS);
+        //TODO update interface graphique
     }
 
     @Override
-    public void messageReadByUsers() throws RemoteException {
-
+    public void messageReadByAllUsers(Message message) throws RemoteException {
+        message.setMessageStatus(MessageStatus.READ_BY_ALL_USERS);
+        //TODO update interface graphique
     }
 
     @Override
     public void inCommingMessage(Message message) throws RemoteException {
+        // Update local du thread
+        Thread thread = message.getThread();
+        Group group = thread.getGroup();
 
+        for(Group g : user.getGroupSet()){
+            if(g.equals(group)){
+                group = g;
+                break;
+            }
+        }
 
+        group.getThreadSet().remove(thread);
+        thread.addMessageList(message);
+        group.addThread(thread);
     }
 
     @Override
     public void update(NavigableSet<Group> groupList) throws RemoteException {
-        user.setGroupList(groupList);
+        user.setGroupSet(groupList);
+        //TODO update interface graphique
     }
 }

@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.NavigableSet;
 import java.util.TreeSet;
+
 import static utils.IdGenerator.idGenerator;
 
 public abstract class User implements Serializable, Comparable<User> {
@@ -13,7 +14,7 @@ public abstract class User implements Serializable, Comparable<User> {
     private final String firstName;
     private final String lastName;
     protected ServerInterface stubServer;
-    private NavigableSet<Group> groupList = new TreeSet<>();
+    private NavigableSet<Group> groupSet = new TreeSet<>();
 
     public User(String firstName, String lastName){
         this.id = idGenerator(firstName, lastName);
@@ -37,16 +38,16 @@ public abstract class User implements Serializable, Comparable<User> {
         this.stubServer = stubServer;
     }
 
-    public NavigableSet<Group> getGroupList() {
-        return groupList;
+    public NavigableSet<Group> getGroupSet() {
+        return groupSet;
     }
 
-    public void setGroupList(NavigableSet<Group> groupList) {
-        this.groupList = groupList;
+    public void setGroupSet(NavigableSet<Group> groupSet) {
+        this.groupSet = groupSet;
     }
 
     public boolean addGroup(Group groupToAdd){
-        return groupList.add(groupToAdd);
+        return groupSet.add(groupToAdd);
     }
 
     public void sendMessage(String text, Thread thread){
@@ -63,7 +64,8 @@ public abstract class User implements Serializable, Comparable<User> {
 
     public void newThread(String title, Group group){
         try{
-            stubServer.newThread(title, group);
+            Thread thread = new Thread(title, this, group);
+            stubServer.newThread(thread);
             System.err.println("Démarrage d'un nouveau thread réussi");
         }
         catch (Exception e){

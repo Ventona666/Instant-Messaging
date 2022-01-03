@@ -35,6 +35,14 @@ public class Group implements Comparable<Group> {
         return userSet.add(userToAdd);
     }
 
+    public boolean removeUser(User userToRemove){
+        return userSet.remove(userToRemove);
+    }
+
+    public boolean addThread(Thread threadToAdd){
+        return threadSet.add(threadToAdd);
+    }
+
     public HashSet<Thread> getThreadSet() {
         return threadSet;
     }

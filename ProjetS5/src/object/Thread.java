@@ -1,7 +1,5 @@
 package object;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import static utils.IdGenerator.idGenerator;
@@ -11,6 +9,7 @@ public class Thread implements Comparable<Thread> {
     private final String title;
     private final User owner;
     private final Group group;
+    private boolean isClose = false;
     private NavigableSet<Message> messageList = new TreeSet<>();
 
     public Thread(String title, User owner, Group group) {
@@ -46,6 +45,14 @@ public class Thread implements Comparable<Thread> {
 
     public void addMessageList(Message message) {
         this.messageList.add(message);
+    }
+
+    public boolean isClose() {
+        return isClose;
+    }
+
+    public boolean closeThread(){
+        return isClose = true;
     }
 
     @Override
