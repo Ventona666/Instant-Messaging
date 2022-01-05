@@ -3,6 +3,7 @@ package server;
 import object.*;
 import client.ClientInterface;
 import object.Thread;
+import utils.IdGenerator;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
@@ -121,19 +122,20 @@ public class Server implements ServerInterface {
     @Override
     public String createAccount(String firstName, String lastName, String password1, String password2) throws RemoteException {
         //Generation du pseudo
-        char[] twoChars = new char[2];
-        lastName.getChars(0,2, twoChars, 0);
-        String username = firstName + twoChars[0] + twoChars[1];
+        char[] threeChars = new char[3];
+        lastName.getChars(0,3, threeChars, 0);
+        String username = firstName.toLowerCase() + threeChars.toString().toUpperCase();
+        User user = new CampusUser(IdGenerator.idGenerator(firstName, lastName), firstName, lastName, username);
 
-        // TODO envoi des elements dans la bdd
-
-
+        if (password1.equals(password2)){
+            database.newUser(user, password1);
+        }
         return username;
     }
 
     @Override
     public void deleteAccount(String userName, String password) throws RemoteException {
-        //TODO suppression dans la bdd
+        database.deleteAccount(userName, password);
     }
 
     @Override
