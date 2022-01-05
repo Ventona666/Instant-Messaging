@@ -16,11 +16,10 @@ import java.util.TreeSet;
 import object.CampusUser;
 import object.Group;
 import object.Message;
+import object.MessageStatus;
 import object.StaffUser;
 import object.User;
 import object.Thread;
-
-import server.ConnexionRefusedException;
 
 public class DatabaseInteraction {
 
@@ -45,7 +44,7 @@ public class DatabaseInteraction {
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS Thread (idThread BIGINT, titleThread VARCHAR(255), idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idThread), FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES Group (idGroup) ON DELETE CASCADE)");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS Message (idMessage BIGINT, dateMessage DATETIME, textMessage MEDIUMTEXT, idUser BIGINT, idThread BIGINT, PRIMARY KEY (idMessage), FOREIGN KEY (idUser) REFERENCES User (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES Thread (idThread) ON DELETE CASCADE))");
+                "CREATE TABLE IF NOT EXISTS Message (idMessage BIGINT, dateMessage DATETIME, textMessage MEDIUMTEXT, nbReMessage INT, nbRdMessage INT, statusMessage TINYINT, idUser BIGINT, idThread BIGINT, PRIMARY KEY (idMessage), FOREIGN KEY (idUser) REFERENCES User (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES Thread (idThread) ON DELETE CASCADE))");
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS Member (idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idUser, idGroup), FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES Group (idGroup) ON DELETE CASCADE)");
         tablesCreateList.add(
@@ -110,7 +109,12 @@ public class DatabaseInteraction {
                 ResultSet rs = stmt.executeQuery(req);) {
             User sender = getUser(rs.getLong("idSender"));
             Thread thread = getThread(rs.getLong("idThread"));
-            return new Message(idMessage, rs.getDate("dateMessage"), sender, rs.getString("textMessage"), thread);
+            Message message = new Message(idMessage, rs.getDate("dateMessage"), sender, rs.getString("textMessage"),
+                    thread);
+            message.setMessageStatus(MessageStatus.values()[rs.getInt("statusMessage")]);
+            message.setNumberOfReceptions(rs.getInt("nbReMessage"));
+            message.setNumberOfReads(rs.getInt("nbRdMessage"));
+            return message;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -119,7 +123,9 @@ public class DatabaseInteraction {
 
     public void newMessage(Message message) {
         String req = "INSERT INTO Message VALUES (" + message.getId() + ", '" + message.getDate() + "', "
-                + message.getSender().getId() + ", '" + message.getText() + "'', " + message.getThread().getId() + ")";
+                + message.getSender().getId() + ", '" + message.getText() + "', " + message.getNumberOfReads()
+                + ", " + message.getNumberOfReceptions() + ", " + message.getMessageStatus().ordinal()
+                + ", " + message.getThread().getId() + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(req);
