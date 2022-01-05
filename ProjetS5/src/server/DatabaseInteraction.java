@@ -122,13 +122,59 @@ public class DatabaseInteraction {
     }
 
     public void newMessage(Message message) {
-        String req = "INSERT INTO Message VALUES (" + message.getId() + ", '" + message.getDate() + "', "
+        String sql = "INSERT INTO Message VALUES (" + message.getId() + ", '" + message.getDate() + "', "
                 + message.getSender().getId() + ", '" + message.getText() + "', " + message.getNumberOfReads()
                 + ", " + message.getNumberOfReceptions() + ", " + message.getMessageStatus().ordinal()
                 + ", " + message.getThread().getId() + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
-            stmt.executeUpdate(req);
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateMessage(Message message) {
+        String sql = "UPDATE Message WHERE idMessage=" + message.getId() + " SET nbReMessage="
+                + message.getNumberOfReceptions() + ", nbRdMessage=" + message.getNumberOfReads() + ", statusMessage="
+                + message.getMessageStatus().ordinal();
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Renvoie le dernier message lu
+    public Message getRead(long idUser, long idThread) {
+        String req = "SELECT idMessage FROM Read WHERE idUser=" + idUser + " AND idThread=" + idThread;
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(req);) {
+            return getMessage(rs.getLong("idMessage"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void updateRead(User user, Thread thread, Message message) {
+        String sql = "UPDATE Read WHERE idUser=" + user.getId() + " AND idThread=" + thread.getId() + " SET idMessage="
+                + message.getId();
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void newRead(long idUser, long idThread, long idMessage) {
+        String sql = "INSERT INTO Read VALUES (" + idUser + "," + idThread + "," + idMessage + ")";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -136,7 +182,7 @@ public class DatabaseInteraction {
 
     public User getUser(long idUser) {
         User user;
-        String req = "SELECT * FROM User WHERE id=" + idUser;
+        String req = "SELECT * FROM User WHERE idUser=" + idUser;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
