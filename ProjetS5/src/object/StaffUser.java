@@ -1,8 +1,8 @@
 package object;
 
 public class StaffUser extends User {
-    public StaffUser(long id, String firstName, String lastName) {
-        super(id, firstName, lastName);
+    public StaffUser(long id, String firstName, String lastName, String username) {
+        super(id, firstName, lastName, username);
     }
 
     public void addToGroup(User user, Group group) {

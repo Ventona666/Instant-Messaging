@@ -136,10 +136,11 @@ public class DatabaseInteraction {
                 ResultSet rs = stmt.executeQuery(req);) {
             String firstName = rs.getString("firstNameUser");
             String lastName = rs.getString("lastNameUser");
+            String username = rs.getString("username");
             if (rs.getString("typeUser").equals("campus"))
-                user = new CampusUser(idUser, firstName, lastName);
+                user = new CampusUser(idUser, firstName, lastName, username);
             else
-                user = new StaffUser(idUser, firstName, lastName);
+                user = new StaffUser(idUser, firstName, lastName, username);
             user.setGroupList(getGroupUser(idUser));
             return user;
         } catch (SQLException e) {
