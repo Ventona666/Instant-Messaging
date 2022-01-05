@@ -1,18 +1,20 @@
 package object;
 
-import java.util.HashSet;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 public class Group implements Comparable<Group> {
-    private final int id;
+    private final long id;
     private String name;
-    private HashSet<User> userSet = new HashSet<>();
-    private HashSet<Thread> threadSet = new HashSet<>();
+    private NavigableSet<User> userList = new TreeSet<>();
+    private NavigableSet<Thread> threadList = new TreeSet<>();
 
-    public Group(int id) {
+    public Group(long id, String name) {
         this.id = id;
+        this.name = name;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -24,16 +26,20 @@ public class Group implements Comparable<Group> {
         this.name = name;
     }
 
-    public HashSet<User> getUserSet() {
-        return userSet;
+    public NavigableSet<User> getUserList() {
+        return userList;
     }
 
     public boolean addUser(User userToAdd) {
-        return userSet.add(userToAdd);
+        return userList.add(userToAdd);
     }
 
-    public HashSet<Thread> getThreadSet() {
-        return threadSet;
+    public NavigableSet<Thread> getThreadList() {
+        return threadList;
+    }
+
+    public void addThread(Thread thread) {
+        threadList.add(thread);
     }
 
     @Override

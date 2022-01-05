@@ -4,13 +4,16 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Message implements Serializable, Comparable<Message> {
-    private final int id;
+    private final long id;
     private final Date date;
     private final User sender;
     private final String text;
     private final Thread thread;
+    private int numberOfReceptions = 0;
+    private int numberOfReads = 0;
+    private MessageStatus messageStatus = MessageStatus.DEFAULT;
 
-    public Message(int id, Date date, User sender, String text, Thread thread) {
+    public Message(long id, Date date, User sender, String text, Thread thread) {
         this.id = id;
         this.date = date;
         this.sender = sender;
@@ -22,7 +25,7 @@ public class Message implements Serializable, Comparable<Message> {
         return thread;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -46,6 +49,24 @@ public class Message implements Serializable, Comparable<Message> {
                 ", idSender=" + sender +
                 ", text='" + text + '\'' +
                 '}';
+    }
+
+    public MessageStatus getMessageStatus() {
+        return messageStatus;
+    }
+
+    public void incrementNumberOfReceptions() {
+        numberOfReceptions++;
+        if (numberOfReceptions == this.thread.getGroup().getUserList().size() + 1) {
+            this.messageStatus = MessageStatus.RECEIVED_BY_ALL_USERS;
+        }
+    }
+
+    public void incrementNumberOfReads() {
+        numberOfReads++;
+        if (numberOfReads == this.thread.getGroup().getUserList().size() + 1) {
+            this.messageStatus = MessageStatus.READ_BY_ALL_USERS;
+        }
     }
 
     @Override

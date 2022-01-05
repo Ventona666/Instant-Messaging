@@ -1,20 +1,34 @@
 package object;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
 public class Thread implements Comparable<Thread> {
-    private final int id;
+    private final long id;
+    private final String title;
+    private final User owner;
+    private final Group group;
     private NavigableSet<Message> messageList = new TreeSet<>();
-    private Group group;
 
-    public Thread(int id, Group group) {
+    public Thread(long id, String title, User owner, Group group) {
         this.id = id;
+        this.title = title;
+        this.owner = owner;
         this.group = group;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public User getOwner() {
+        return owner;
     }
 
     public Group getGroup() {
@@ -29,7 +43,7 @@ public class Thread implements Comparable<Thread> {
         this.messageList = messageList;
     }
 
-    public void addMessageList(Message message) {
+    public void addMessage(Message message) {
         this.messageList.add(message);
     }
 
@@ -39,5 +53,10 @@ public class Thread implements Comparable<Thread> {
             return -1;
         }
         return 1;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * title.hashCode();
     }
 }
