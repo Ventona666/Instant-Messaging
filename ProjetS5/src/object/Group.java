@@ -1,17 +1,23 @@
 package object;
 
+import utils.IdGenerator;
 
-import java.util.HashSet;
-import static utils.IdGenerator.idGenerator;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 public class Group implements Comparable<Group> {
     private final long id;
     private String name;
-    private HashSet<User> userSet = new HashSet<>();
-    private HashSet<Thread> threadSet = new HashSet<>();
+    private NavigableSet<User> userList = new TreeSet<>();
+    private NavigableSet<Thread> threadList = new TreeSet<>();
 
-    public Group(String name) {
-        this.id = idGenerator(name);
+    public Group(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Group(String name){
+        this.id = IdGenerator.idGenerator(name);
         this.name = name;
     }
 
@@ -27,24 +33,20 @@ public class Group implements Comparable<Group> {
         this.name = name;
     }
 
-    public HashSet<User> getUserSet() {
-        return userSet;
+    public NavigableSet<User> getUserList() {
+        return userList;
     }
 
     public boolean addUser(User userToAdd) {
-        return userSet.add(userToAdd);
+        return userList.add(userToAdd);
     }
 
-    public boolean removeUser(User userToRemove){
-        return userSet.remove(userToRemove);
+    public NavigableSet<Thread> getThreadList() {
+        return threadList;
     }
 
-    public boolean addThread(Thread threadToAdd){
-        return threadSet.add(threadToAdd);
-    }
-
-    public HashSet<Thread> getThreadSet() {
-        return threadSet;
+    public void addThread(Thread thread) {
+        threadList.add(thread);
     }
 
     @Override

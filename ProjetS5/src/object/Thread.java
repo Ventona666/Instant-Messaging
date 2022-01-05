@@ -19,6 +19,13 @@ public class Thread implements Comparable<Thread> {
         this.group = group;
     }
 
+    public Thread(long id, String title, User owner, Group group){
+        this.id = id;
+        this.title = title;
+        this.owner = owner;
+        this.group = group;
+    }
+
     public long getId() {
         return id;
     }

@@ -23,6 +23,14 @@ public class Message implements Serializable, Comparable<Message> {
         this.thread = thread;
     }
 
+    public Message(long id, Date date, User sender, String text, Thread thread){
+        this.id = id;
+        this.date = date;
+        this.sender = sender;
+        this.text = text;
+        this.thread = thread;
+    }
+
     public Thread getThread() {
         return thread;
     }
@@ -61,16 +69,16 @@ public class Message implements Serializable, Comparable<Message> {
         this.messageStatus = messageStatus;
     }
 
-    public void incrementNumberOfReceptions(){
+    public void incrementNumberOfReceptions() {
         numberOfReceptions++;
-        if(numberOfReceptions == this.thread.getGroup().getUserSet().size() + 1){
+        if (numberOfReceptions == this.thread.getGroup().getUserList().size() + 1) {
             this.messageStatus = MessageStatus.RECEIVED_BY_ALL_USERS;
         }
     }
 
-    public void incrementNumberOfReads(){
+    public void incrementNumberOfReads() {
         numberOfReads++;
-        if(numberOfReads == this.thread.getGroup().getUserSet().size() + 1){
+        if (numberOfReads == this.thread.getGroup().getUserList().size() + 1) {
             this.messageStatus = MessageStatus.READ_BY_ALL_USERS;
         }
     }

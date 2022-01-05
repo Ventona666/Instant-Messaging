@@ -13,13 +13,18 @@ public abstract class User implements Serializable, Comparable<User> {
     private final long id;
     private final String firstName;
     private final String lastName;
+    private final String username;
     protected ServerInterface stubServer;
     private NavigableSet<Group> groupSet = new TreeSet<>();
 
-    public User(String firstName, String lastName){
-        this.id = idGenerator(firstName, lastName);
+
+
+
+    public User(long id, String firstName, String lastName, String username){
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.username = username;
     }
 
     public long getId() {
@@ -32,6 +37,10 @@ public abstract class User implements Serializable, Comparable<User> {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public void setStubServer(ServerInterface stubServer) {
