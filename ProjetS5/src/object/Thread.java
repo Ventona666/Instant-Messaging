@@ -59,4 +59,9 @@ public class Thread implements Comparable<Thread> {
     public int hashCode() {
         return 31 * title.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return title;
+    }
 }

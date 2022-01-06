@@ -4,11 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.spi.CurrencyNameProvider;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,6 +24,9 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import object.Group;
@@ -33,6 +39,7 @@ public class GraphicsClientInterface {
 
     private User user;
     private String name;
+    private Thread currentThread = null;
 
     // Components
 
@@ -45,6 +52,8 @@ public class GraphicsClientInterface {
     private JPanel bottomRightPanel;
     private JPanel topPanel;
     private JScrollPane scrollPane;
+    private DefaultTableModel messageModel;
+    private JTable messageTable;
 
     // private Color blue = new Color(16, 79, 85, 255);
 
@@ -60,6 +69,7 @@ public class GraphicsClientInterface {
         buildScrollPane();
         buildLeftPanel();
         buildBottomRightPanel();
+        buildMessageTable();
         buildRightPanel();
         buildSplitPane();
     }
@@ -100,8 +110,7 @@ public class GraphicsClientInterface {
         rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
         rightPanel.add(bottomRightPanel, BorderLayout.SOUTH);
-        JTable table = new JTable();
-        rightPanel.add(table, BorderLayout.NORTH);
+        rightPanel.add(messageTable, BorderLayout.CENTER);
     }
 
     private void buildBottomRightPanel() {
@@ -141,13 +150,51 @@ public class GraphicsClientInterface {
         TreeMap<Group, TreeSet<Thread>> threadList = user.getAllThread();
         for (Group group : threadList.keySet()) {
             DefaultMutableTreeNode groupTemp = new DefaultMutableTreeNode(group.getName());
-            groups.add(groupTemp);
+            if (!threadList.get(group).isEmpty())
+                groups.add(groupTemp);
             for (Thread thread : threadList.get(group)) {
                 DefaultMutableTreeNode threadTemp = new DefaultMutableTreeNode(thread.getTitle());
+                threadTemp.setUserObject(thread);
                 groupTemp.add(threadTemp);
             }
         }
         threadTree = new JTree(groups);
+        threadTree.addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent e) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) threadTree.getLastSelectedPathComponent();
+                if (node == null || !node.isLeaf())
+                    return;
+                currentThread = (Thread) node.getUserObject();
+                updateMessageTableNewThread();
+            }
+        });
+    }
+
+    private void buildMessageTable() {
+        String[] columns = { "", "" };
+        messageModel = new DefaultTableModel(columns, 0);
+        messageTable = new JTable(messageModel);
+    }
+
+    private void updateMessageTable() {
+        List<Message> messageList = new ArrayList<>(currentThread.getMessageList());
+        for (Iterator<Message> it = messageList.listIterator(messageModel.getRowCount()); it.hasNext();) {
+            Message currentMessage = it.next();
+            messageModel.addRow(new Object[] { "", currentMessage.getText() });
+        }
+    }
+
+    private void updateMessageTableNewThread() {
+        for (int i = 0; i < messageModel.getRowCount(); i++) {
+            messageModel.removeRow(i);
+        }
+        for (Message currentMessage : currentThread.getMessageList()) {
+            messageModel.addRow(new Object[] { "", currentMessage.getText() });
+        }
+    }
+
+    private void updateTree() {
+        // CHANGER L'ARBRE SI NOUVEAU MESSAGE OU NOUVEAU THREAD
     }
 
     public void build() {
@@ -156,8 +203,8 @@ public class GraphicsClientInterface {
     }
 
     public static void main(String[] args) {
-        CampusUser user = new CampusUser(1, "Sabrina", "Sikder");
-        CampusUser user2 = new CampusUser(2, "Hugo", "Deleye");
+        CampusUser user = new CampusUser(1, "Sabrina", "Sikder", "sabrinaSI");
+        CampusUser user2 = new CampusUser(2, "Hugo", "Deleye", "hugoDE");
         Group student = new Group(0, "Étudiant");
         Group grp1 = new Group(1, "TDA1");
         Group grp2 = new Group(2, "TDA2");

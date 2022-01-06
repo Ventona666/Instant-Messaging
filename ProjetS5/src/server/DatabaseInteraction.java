@@ -32,7 +32,7 @@ public class DatabaseInteraction {
     private static final String DB_PASS = "ProjetS5!";
 
     public DatabaseInteraction() {
-        dbUrl = DB_PROT + "//" + DB_IP + ":" + DB_PORT + "/" + DB_NAME + "?useSSL=false";
+        dbUrl = DB_PROT + "//" + DB_IP + ":" + DB_PORT + "/" + DB_NAME;
     }
 
     public void initialisation() {
@@ -305,6 +305,10 @@ public class DatabaseInteraction {
 
     public boolean uniqueIdMessage(long idMessage) {
         return getMessage(idMessage) == null;
+    }
+
+    public boolean uniqueIdRead(long idUser, long idThread) {
+        return getRead(idUser, idThread) == null;
     }
 
     public static void main(String[] args) {
