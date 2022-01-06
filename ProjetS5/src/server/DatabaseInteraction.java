@@ -38,17 +38,17 @@ public class DatabaseInteraction {
     public void initialisation() {
         List<String> tablesCreateList = new ArrayList<String>();
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS Group (idGroup BIGINT, nameGroup VARCHAR(255), PRIMARY KEY (idGroup))");
+                "CREATE TABLE IF NOT EXISTS GroupT (idGroup BIGINT, nameGroup VARCHAR(255), PRIMARY KEY (idGroup));");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS User (idUser BINGINT, passwordUser VARCHAR(255), firstNameUser VARCHAR(255), lastNameUser VARCHAR(255), username VARCHAR(255), typeUser VARCHAR(20), PRIMARY KEY (idUser))");
+                "CREATE TABLE IF NOT EXISTS UserT (idUser BINGINT, passwordUser VARCHAR(255), firstNameUser VARCHAR(255), lastNameUser VARCHAR(255), username VARCHAR(255), typeUser VARCHAR(20), PRIMARY KEY (idUser));");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS Thread (idThread BIGINT, titleThread VARCHAR(255), idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idThread), FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES Group (idGroup) ON DELETE CASCADE)");
+                "CREATE TABLE IF NOT EXISTS ThreadT (idThread BIGINT, titleThread VARCHAR(255), idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS Message (idMessage BIGINT, dateMessage DATETIME, textMessage MEDIUMTEXT, nbReMessage INT, nbRdMessage INT, statusMessage TINYINT, idUser BIGINT, idThread BIGINT, PRIMARY KEY (idMessage), FOREIGN KEY (idUser) REFERENCES User (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES Thread (idThread) ON DELETE CASCADE))");
+                "CREATE TABLE IF NOT EXISTS MessageT (idMessage BIGINT, dateMessage DATETIME, textMessage MEDIUMTEXT, nbReMessage INT, nbRdMessage INT, statusMessage TINYINT, idUser BIGINT, idThread BIGINT, PRIMARY KEY (idMessage), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES Thread (idThread) ON DELETE CASCADE));");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS Member (idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idUser, idGroup), FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES Group (idGroup) ON DELETE CASCADE)");
+                "CREATE TABLE IF NOT EXISTS MemberT (idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idUser, idGroup), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS Read (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES User(idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES Thread (idThread) ON DELETE CASCADE)");
+                "CREATE TABLE IF NOT EXISTS ReadT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
         for (String sql : tablesCreateList) {
             try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                     Statement stmt = con.createStatement();) {
@@ -63,7 +63,7 @@ public class DatabaseInteraction {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
         String passwordEnter = new String(hash, StandardCharsets.UTF_8);
-        String req = "SELECT idUser, passwordUser FROM User WHERE username=" + username;
+        String req = "SELECT idUser, passwordUser FROM UserT WHERE username=" + username;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
@@ -78,7 +78,7 @@ public class DatabaseInteraction {
     }
 
     public Thread getThread(long idThread) {
-        String req = "SELECT * FROM Thread WHERE idThread=" + idThread;
+        String req = "SELECT * FROM ThreadT WHERE idThread=" + idThread;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
@@ -92,7 +92,7 @@ public class DatabaseInteraction {
     }
 
     public void newThread(Thread thread) {
-        String req = "INSERT INTO Thread VALUES (" + thread.getId() + ", '" + thread.getTitle() + "', "
+        String req = "INSERT INTO ThreadT VALUES (" + thread.getId() + ", '" + thread.getTitle() + "', "
                 + thread.getOwner().getId() + ", " + thread.getGroup().getId() + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
@@ -103,7 +103,7 @@ public class DatabaseInteraction {
     }
 
     public Message getMessage(long idMessage) {
-        String req = "SELECT * FROM Message WHERE id=" + idMessage;
+        String req = "SELECT * FROM MessageT WHERE id=" + idMessage;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
@@ -122,7 +122,7 @@ public class DatabaseInteraction {
     }
 
     public void newMessage(Message message) {
-        String sql = "INSERT INTO Message VALUES (" + message.getId() + ", '" + message.getDate() + "', "
+        String sql = "INSERT INTO MessageT VALUES (" + message.getId() + ", '" + message.getDate() + "', "
                 + message.getSender().getId() + ", '" + message.getText() + "', " + message.getNumberOfReads()
                 + ", " + message.getNumberOfReceptions() + ", " + message.getMessageStatus().ordinal()
                 + ", " + message.getThread().getId() + ")";
@@ -135,7 +135,7 @@ public class DatabaseInteraction {
     }
 
     public void updateMessage(Message message) {
-        String sql = "UPDATE Message WHERE idMessage=" + message.getId() + " SET nbReMessage="
+        String sql = "UPDATE MessageT WHERE idMessage=" + message.getId() + " SET nbReMessage="
                 + message.getNumberOfReceptions() + ", nbRdMessage=" + message.getNumberOfReads() + ", statusMessage="
                 + message.getMessageStatus().ordinal();
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
@@ -148,7 +148,7 @@ public class DatabaseInteraction {
 
     // Renvoie le dernier message lu
     public Message getRead(long idUser, long idThread) {
-        String req = "SELECT idMessage FROM Read WHERE idUser=" + idUser + " AND idThread=" + idThread;
+        String req = "SELECT idMessage FROM ReadT WHERE idUser=" + idUser + " AND idThread=" + idThread;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
@@ -160,7 +160,7 @@ public class DatabaseInteraction {
     }
 
     public void updateRead(User user, Thread thread, Message message) {
-        String sql = "UPDATE Read WHERE idUser=" + user.getId() + " AND idThread=" + thread.getId() + " SET idMessage="
+        String sql = "UPDATE ReadT WHERE idUser=" + user.getId() + " AND idThread=" + thread.getId() + " SET idMessage="
                 + message.getId();
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
@@ -171,7 +171,7 @@ public class DatabaseInteraction {
     }
 
     public void newRead(long idUser, long idThread, long idMessage) {
-        String sql = "INSERT INTO Read VALUES (" + idUser + "," + idThread + "," + idMessage + ")";
+        String sql = "INSERT INTO ReadT VALUES (" + idUser + "," + idThread + "," + idMessage + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
@@ -182,7 +182,7 @@ public class DatabaseInteraction {
 
     public User getUser(long idUser) {
         User user;
-        String req = "SELECT * FROM User WHERE idUser=" + idUser;
+        String req = "SELECT * FROM UserT WHERE idUser=" + idUser;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
@@ -203,7 +203,8 @@ public class DatabaseInteraction {
 
     public void newUser(User user, String password) {
         String typeUser = user instanceof CampusUser ? "campus" : "staff";
-        String req = "INSERT INTO User VALUES (" + user.getId() + ", '" + password + ", '" + user.getFirstName() + "', "
+        String req = "INSERT INTO UserT VALUES (" + user.getId() + ", '" + password + ", '" + user.getFirstName()
+                + "', "
                 + user.getLastName() + ", '" + user.getUsername() + "'', '"
                 + typeUser + "')";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
@@ -216,7 +217,7 @@ public class DatabaseInteraction {
 
     private NavigableSet<Group> getGroupUser(long idUser) {
         NavigableSet<Group> listGroup = new TreeSet<>();
-        String req = "SELECT idGroup FROM Member WHERE idUser=" + idUser;
+        String req = "SELECT idGroup FROM MemberT WHERE idUser=" + idUser;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
@@ -231,7 +232,7 @@ public class DatabaseInteraction {
 
     public NavigableSet<Group> getAllGroup() {
         NavigableSet<Group> listGroup = new TreeSet<>();
-        String req = "SELECT idGroup FROM Group";
+        String req = "SELECT idGroup FROM GroupT";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
@@ -245,7 +246,7 @@ public class DatabaseInteraction {
     }
 
     public Group getGroup(long idGroup) {
-        String req = "SELECT * FROM Group WHERE id=" + idGroup;
+        String req = "SELECT * FROM GroupT WHERE id=" + idGroup;
         // id name user thread
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
@@ -264,7 +265,7 @@ public class DatabaseInteraction {
     }
 
     private NavigableSet<User> getUserGroup(long idGroup) {
-        String req = "SELECT idUser FROM Member WHERE idGroup=" + idGroup;
+        String req = "SELECT idUser FROM MemberT WHERE idGroup=" + idGroup;
         NavigableSet<User> listUser = new TreeSet<>();
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
@@ -278,7 +279,7 @@ public class DatabaseInteraction {
     }
 
     private NavigableSet<Thread> getThreadGroup(long idGroup) {
-        String req = "SELECT idThread FROM Thread WHERE idGroup=" + idGroup;
+        String req = "SELECT idThread FROM ThreadT WHERE idGroup=" + idGroup;
         NavigableSet<Thread> listThread = new TreeSet<>();
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
