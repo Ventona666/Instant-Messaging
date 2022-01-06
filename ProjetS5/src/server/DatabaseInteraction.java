@@ -211,6 +211,19 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(req);
+            for (Group group : user.getGroupList()) {
+                newMember(user, group);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void newMember(User user, Group group) {
+        String req = "INSERT INTO MemberT VALUES (" + user.getId() + ", " + group.getId() + ")";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(req);
         } catch (SQLException e) {
             e.printStackTrace();
         }
