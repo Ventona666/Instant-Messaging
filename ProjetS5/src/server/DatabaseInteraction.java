@@ -33,6 +33,7 @@ public class DatabaseInteraction {
 
     public DatabaseInteraction() {
         dbUrl = DB_PROT + "//" + DB_IP + ":" + DB_PORT + "/" + DB_NAME;
+        initialisation();
     }
 
     public void initialisation() {
@@ -40,15 +41,15 @@ public class DatabaseInteraction {
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS GroupT (idGroup BIGINT, nameGroup VARCHAR(255), PRIMARY KEY (idGroup));");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS UserT (idUser BINGINT, passwordUser VARCHAR(255), firstNameUser VARCHAR(255), lastNameUser VARCHAR(255), username VARCHAR(255), typeUser VARCHAR(20), PRIMARY KEY (idUser));");
+                "CREATE TABLE IF NOT EXISTS UserT (idUser BIGINT, passwordUser VARCHAR(255), firstNameUser VARCHAR(255), lastNameUser VARCHAR(255), username VARCHAR(255), typeUser VARCHAR(20), PRIMARY KEY (idUser));");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS ThreadT (idThread BIGINT, titleThread VARCHAR(255), idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
+                "CREATE TABLE IF NOT EXISTS ThreadT (idThread BIGINT, titleThread VARCHAR(255), idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup) REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS MessageT (idMessage BIGINT, dateMessage DATETIME, textMessage MEDIUMTEXT, nbReMessage INT, nbRdMessage INT, statusMessage TINYINT, idUser BIGINT, idThread BIGINT, PRIMARY KEY (idMessage), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES Thread (idThread) ON DELETE CASCADE));");
+                "CREATE TABLE IF NOT EXISTS MessageT (idMessage BIGINT, dateMessage DATETIME, textMessage MEDIUMTEXT, nbReMessage INT, nbRdMessage INT, statusMessage TINYINT, idUser BIGINT, idThread BIGINT, PRIMARY KEY (idMessage), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS MemberT (idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idUser, idGroup), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup), REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
+                "CREATE TABLE IF NOT EXISTS MemberT (idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idUser, idGroup), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup) REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS ReadT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread), REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
+                "CREATE TABLE IF NOT EXISTS ReadT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
         for (String sql : tablesCreateList) {
             try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                     Statement stmt = con.createStatement();) {
@@ -314,7 +315,6 @@ public class DatabaseInteraction {
 
     public static void main(String[] args) {
         DatabaseInteraction db = new DatabaseInteraction();
-        db.initialisation();
     }
 
 }
