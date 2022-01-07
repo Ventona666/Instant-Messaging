@@ -55,4 +55,8 @@ public class Group implements Comparable<Group> {
     public int compareTo(Group group) {
         return name.compareTo(group.getName());
     }
+
+    public String toString() {
+        return name;
+    }
 }

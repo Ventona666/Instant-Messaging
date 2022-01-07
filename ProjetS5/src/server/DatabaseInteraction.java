@@ -327,7 +327,7 @@ public class DatabaseInteraction {
     }
 
     public static void main(String[] args) {
-        DatabaseInteraction db = new DatabaseInteraction();
+        new DatabaseInteraction();
     }
 
 }
