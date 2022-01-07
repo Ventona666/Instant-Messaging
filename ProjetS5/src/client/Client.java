@@ -63,7 +63,7 @@ public class Client implements ClientInterface{
         String password2 =  console.nextLine();
 
         try {
-            String username = stubServer.createAccount(firstName, lastName, password1, password2);
+            String username = stubServer.createAccount(firstName, lastName, password1, password2, false);
             System.out.println(username);
             System.err.println("Création du compte réussi");
             user = stubServer.logIn(username, password1);

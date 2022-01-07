@@ -119,13 +119,19 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public String createAccount(String firstName, String lastName, String password1, String password2) throws RemoteException {
+    public String createAccount(String firstName, String lastName, String password1, String password2, boolean isStaff) throws RemoteException {
         //Generation du pseudo
-        User newCampusUser = new CampusUser(firstName, lastName);
+        User user;
+        if(isStaff){
+            user = new StaffUser(firstName, lastName);
+        }
+        else {
+            user = new CampusUser(firstName, lastName);
+        }
 
         if(password1.equals(password2)) {
             try {
-                database.newUser(newCampusUser, password1);
+                database.newUser(user, password1);
             }
             catch (NoSuchAlgorithmException noSuchAlgorithmException){
                 System.err.println("Erreur lors du hashage du mot de passe : " + noSuchAlgorithmException);
@@ -133,7 +139,7 @@ public class Server implements ServerInterface {
             }
         }
 
-        return newCampusUser.getUsername();
+        return user.getUsername();
     }
 
     @Override

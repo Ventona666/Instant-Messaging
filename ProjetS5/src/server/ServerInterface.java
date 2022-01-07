@@ -17,7 +17,7 @@ public interface ServerInterface extends Remote {
     void pong() throws RemoteException;
     void newThread(Thread thread) throws RemoteException;
     void closeThread(int idThread) throws RemoteException;
-    String createAccount(String firstName, String lastName, String password1, String password2) throws RemoteException;
+    String createAccount(String firstName, String lastName, String password1, String password2, boolean isStaff) throws RemoteException;
     void deleteAccount(String userName, String password) throws RemoteException;
     User logIn(String username, String password) throws RemoteException, ConnexionRefusedException;
     void logOut(User user) throws  RemoteException;
