@@ -50,6 +50,8 @@ public class DatabaseInteraction {
                 "CREATE TABLE IF NOT EXISTS MemberT (idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idUser, idGroup), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup) REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS ReadT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
+        tablesCreateList.add(
+                "CREATE TABLE IF NOT EXISTS ReceiveT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
         for (String sql : tablesCreateList) {
             try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                     Statement stmt = con.createStatement();) {
@@ -181,6 +183,40 @@ public class DatabaseInteraction {
         }
     }
 
+    public Message getReceive(long idUser, long idThread) {
+        String req = "SELECT idMessage FROM ReceiveT WHERE idUser=" + idUser + " AND idThread=" + idThread;
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(req);) {
+            return getMessage(rs.getLong("idMessage"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void updateReceive(User user, Thread thread, Message message) {
+        String sql = "UPDATE ReceiveT WHERE idUser=" + user.getId() + " AND idThread=" + thread.getId()
+                + " SET idMessage="
+                + message.getId();
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void newReceive(long idUser, long idThread, long idMessage) {
+        String sql = "INSERT INTO ReceiveT VALUES (" + idUser + "," + idThread + "," + idMessage + ")";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public User getUser(long idUser) {
         User user;
         String req = "SELECT * FROM UserT WHERE idUser=" + idUser;
@@ -290,6 +326,16 @@ public class DatabaseInteraction {
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public void newGroup(Group group) {
+        String req = "INSERT INTO GroupT VALUES (" + group.getId() + ", '" + group.getName() + "')";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(req);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
