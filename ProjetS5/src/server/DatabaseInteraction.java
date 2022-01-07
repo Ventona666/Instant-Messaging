@@ -194,7 +194,7 @@ public class DatabaseInteraction {
                 user = new CampusUser(idUser, firstName, lastName, username);
             else
                 user = new StaffUser(idUser, firstName, lastName, username);
-            user.setGroupList(getGroupUser(idUser));
+            user.setGroupSet(getGroupUser(idUser));
             return user;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -211,7 +211,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(req);
-            for (Group group : user.getGroupList()) {
+            for (Group group : user.getGroupSet()) {
                 newMember(user, group);
             }
         } catch (SQLException e) {
@@ -257,6 +257,21 @@ public class DatabaseInteraction {
             e.printStackTrace();
         }
         return listGroup;
+    }
+
+    public NavigableSet<User> getAllUser() {
+        NavigableSet<User> listUser = new TreeSet<>();
+        String req = "SELECT idUser FROM UserT";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(req);) {
+            while (rs.next()) {
+                listUser.add(getUser(rs.getLong("idUser")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listUser;
     }
 
     public Group getGroup(long idGroup) {

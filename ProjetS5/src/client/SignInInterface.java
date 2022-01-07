@@ -53,8 +53,8 @@ class SignInInterface extends JFrame {
 
     }
 
-    public GraphicsClientInterface Connection(User user) {
-        GraphicsClientInterface app = new GraphicsClientInterface(user);
+    public ClientGUI Connection(User user) {
+        ClientGUI app = new ClientGUI(user);
         frame.dispose();
         return app;
     }

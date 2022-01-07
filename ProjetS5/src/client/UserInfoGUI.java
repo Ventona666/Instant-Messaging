@@ -2,8 +2,6 @@ package client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
@@ -17,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 
 import object.Group;
 import object.User;
+import utils.SetToList;
 
 public class UserInfoGUI {
 
@@ -55,12 +54,7 @@ public class UserInfoGUI {
     }
 
     private void buildGroupScrollPane() {
-        Group[] listGroup = new Group[user.getGroupList().size()];
-        int i = 0;
-        for (Group group : user.getGroupList()) {
-            listGroup[i] = group;
-            i++;
-        }
+        Group[] listGroup = (Group[]) SetToList.convert(user.getGroupSet());
         JList<Group> groupJList = new JList<>(listGroup);
         groupScrollPane = new JScrollPane(groupJList);
     }
@@ -89,37 +83,49 @@ public class UserInfoGUI {
         groupLayoutBottomPanel.setHorizontalGroup(groupLayoutBottomPanel.createParallelGroup(Alignment.LEADING)
                 .addGroup(groupLayoutBottomPanel.createSequentialGroup()
                         .addGroup(groupLayoutBottomPanel.createParallelGroup(Alignment.LEADING)
-                                .addGroup(groupLayoutBottomPanel.createSequentialGroup().addGap(232)
-                                        .addGroup(groupLayoutBottomPanel.createParallelGroup(Alignment.TRAILING)
+                                .addGroup(groupLayoutBottomPanel.createSequentialGroup()
+                                        .addGap(232)
+                                        .addGroup(groupLayoutBottomPanel
+                                                .createParallelGroup(
+                                                        Alignment.TRAILING)
                                                 .addComponent(firstNameLabel)
                                                 .addComponent(lastNameLabel))
                                         .addGap(28)
-                                        .addGroup(groupLayoutBottomPanel.createParallelGroup(Alignment.LEADING)
-                                                .addComponent(lastNameUserLabel, GroupLayout.PREFERRED_SIZE, 98,
+                                        .addGroup(groupLayoutBottomPanel
+                                                .createParallelGroup(
+                                                        Alignment.LEADING)
+                                                .addComponent(lastNameUserLabel,
+                                                        GroupLayout.PREFERRED_SIZE,
+                                                        98,
                                                         GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(firstNameUserLabel)))
-                                .addGroup(groupLayoutBottomPanel.createSequentialGroup().addGap(148)
+                                .addGroup(groupLayoutBottomPanel.createSequentialGroup()
+                                        .addGap(148)
                                         .addComponent(myGroupsLabel)))
                         .addContainerGap(252, Short.MAX_VALUE))
                 .addGroup(Alignment.TRAILING,
                         groupLayoutBottomPanel.createSequentialGroup().addContainerGap(249,
                                 Short.MAX_VALUE)
-                                .addComponent(groupScrollPane, GroupLayout.PREFERRED_SIZE, 168,
+                                .addComponent(groupScrollPane,
+                                        GroupLayout.PREFERRED_SIZE, 168,
                                         GroupLayout.PREFERRED_SIZE)
                                 .addGap(229)));
         groupLayoutBottomPanel.setVerticalGroup(
                 groupLayoutBottomPanel.createParallelGroup(Alignment.LEADING)
                         .addGroup(groupLayoutBottomPanel.createSequentialGroup().addGap(44)
-                                .addGroup(groupLayoutBottomPanel.createParallelGroup(Alignment.BASELINE)
+                                .addGroup(groupLayoutBottomPanel
+                                        .createParallelGroup(Alignment.BASELINE)
                                         .addComponent(lastNameLabel)
                                         .addComponent(lastNameUserLabel))
                                 .addGap(18)
-                                .addGroup(groupLayoutBottomPanel.createParallelGroup(Alignment.BASELINE)
+                                .addGroup(groupLayoutBottomPanel
+                                        .createParallelGroup(Alignment.BASELINE)
                                         .addComponent(firstNameLabel)
                                         .addComponent(firstNameUserLabel))
                                 .addGap(65).addComponent(myGroupsLabel)
                                 .addPreferredGap(ComponentPlacement.UNRELATED)
-                                .addComponent(groupScrollPane, GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                                .addComponent(groupScrollPane, GroupLayout.DEFAULT_SIZE,
+                                        159, Short.MAX_VALUE)
                                 .addGap(18)));
         bottomPanel.setLayout(groupLayoutBottomPanel);
         mainPane.add(bottomPanel, BorderLayout.CENTER);

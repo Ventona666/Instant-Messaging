@@ -1,16 +1,23 @@
 package object;
 
+import utils.IdGenerator;
+
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
 public class Group implements Comparable<Group> {
     private final long id;
     private String name;
-    private NavigableSet<User> userList = new TreeSet<>();
-    private NavigableSet<Thread> threadList = new TreeSet<>();
+    private NavigableSet<User> userSet = new TreeSet<>();
+    private NavigableSet<Thread> threadSet = new TreeSet<>();
 
     public Group(long id, String name) {
         this.id = id;
+        this.name = name;
+    }
+
+    public Group(String name) {
+        this.id = IdGenerator.idGenerator(name);
         this.name = name;
     }
 
@@ -26,20 +33,24 @@ public class Group implements Comparable<Group> {
         this.name = name;
     }
 
-    public NavigableSet<User> getUserList() {
-        return userList;
+    public NavigableSet<User> getUserSet() {
+        return userSet;
     }
 
     public boolean addUser(User userToAdd) {
-        return userList.add(userToAdd);
+        return userSet.add(userToAdd);
     }
 
-    public NavigableSet<Thread> getThreadList() {
-        return threadList;
+    public boolean removeUser(User userToDelete) {
+        return userSet.remove(userToDelete);
+    }
+
+    public NavigableSet<Thread> getThreadSet() {
+        return threadSet;
     }
 
     public void addThread(Thread thread) {
-        threadList.add(thread);
+        threadSet.add(thread);
     }
 
     @Override

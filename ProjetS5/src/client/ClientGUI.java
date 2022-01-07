@@ -1,17 +1,14 @@
 package client;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.spi.CurrencyNameProvider;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,14 +21,11 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import object.Group;
@@ -40,10 +34,9 @@ import object.Thread;
 import object.User;
 import object.CampusUser;
 
-public class GraphicsClientInterface {
+public class ClientGUI {
 
     private User user;
-    private String name;
     private Thread currentThread = null;
 
     // Components
@@ -59,14 +52,11 @@ public class GraphicsClientInterface {
     private JScrollPane scrollPane;
     private DefaultTableModel messageModel;
     private JTable messageTable;
-    private JTextPane messageStyleTextPane;
 
     // private Color blue = new Color(16, 79, 85, 255);
 
-    public GraphicsClientInterface(User user) {
+    public ClientGUI(User user) {
         this.user = user;
-        name = user.getFirstName() + " " + user.getLastName();
-        build();
     }
 
     private void buildComponents() {
@@ -82,7 +72,7 @@ public class GraphicsClientInterface {
 
     private void setMainFrame() {
         frame = new JFrame("Poucavor 2000");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setMinimumSize(new Dimension(1000, 600));
         frame.setLocationRelativeTo(null);
         frame.setResizable(true);
@@ -186,7 +176,7 @@ public class GraphicsClientInterface {
         List<Message> messageList = new ArrayList<>(currentThread.getMessageList());
         for (Iterator<Message> it = messageList.listIterator(messageModel.getRowCount()); it.hasNext();) {
             Message currentMessage = it.next();
-            messageModel.addRow(new Object[] { "", currentMessage.getText() });
+            messageModel.addRow(new Object[] { null, currentMessage });
         }
     }
 
@@ -195,47 +185,12 @@ public class GraphicsClientInterface {
             messageModel.removeRow(i);
         }
         for (Message currentMessage : currentThread.getMessageList()) {
-            messageModel.addRow(new Object[] { "", currentMessage.getText() });
+            messageModel.addRow(new Object[] { null, currentMessage });
         }
-        buildMessageStyle();
-        messageModel.addRow(new Object[] { null, messageStyleTextPane });
     }
 
     private void buildMessageStyle() {
-        messageStyleTextPane = new JTextPane();
-        // définition des styles
-        Style defaut = messageStyleTextPane.getStyle("default");
-        Style style1 = messageStyleTextPane.addStyle("style1", defaut);
-        StyleConstants.setFontFamily(style1, "Comic sans MS");
-        Style style2 = messageStyleTextPane.addStyle("style2", style1);
-        StyleConstants.setForeground(style2, Color.RED);
-        StyleConstants.setFontSize(style2, 25);
 
-        String s1 = "Sous le pont Mirabeau coule la Seine " +
-                "Et nos amours " +
-                "Faut-il qu'il m'en souvienne " +
-                "La joie venait toujours après la peine. ";
-        String s2 = "Vienne la nuit sonne l'heure " +
-                "Les jours s'en vont je demeure ";
-        String s3 = "Les mains dans les mains restons face à face " +
-                "Tandis que sous " +
-                "Le pont de nos bras passe " +
-                "Des éternels regards l'onde si lasse. " +
-                "L'amour s'en va comme cette eau courante " +
-                "L'amour s'en va " +
-                "Comme la vie est lente " +
-                "Et comme l'Espérance est violente.";
-        StyledDocument sDoc = (StyledDocument) messageStyleTextPane.getDocument();
-        try {
-            int pos = 0;
-            sDoc.insertString(pos, s1, defaut);
-            pos += s1.length();
-            sDoc.insertString(pos, s2, style1);
-            pos += s2.length();
-            sDoc.insertString(pos, s3, style2);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
     }
 
     private void updateTree() {
@@ -275,6 +230,7 @@ public class GraphicsClientInterface {
         grp1.addThread(th3);
         th3.addMessage(new Message(3, new Date(), user2,
                 "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
-        new GraphicsClientInterface(user);
+        new ClientGUI(user).build();
+        new UserInfoGUI(user2).build();
     }
 }

@@ -1,5 +1,7 @@
 package object;
 
+import utils.IdGenerator;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -12,6 +14,14 @@ public class Message implements Serializable, Comparable<Message> {
     private int numberOfReceptions = 0;
     private int numberOfReads = 0;
     private MessageStatus messageStatus = MessageStatus.DEFAULT;
+
+    public Message(Date date, User sender, String text, Thread thread) {
+        this.id = IdGenerator.idGenerator(text);
+        this.date = date;
+        this.sender = sender;
+        this.text = text;
+        this.thread = thread;
+    }
 
     public Message(long id, Date date, User sender, String text, Thread thread) {
         this.id = id;
@@ -50,8 +60,22 @@ public class Message implements Serializable, Comparable<Message> {
         return messageStatus;
     }
 
-    public void setMessageStatus(MessageStatus status) {
-        this.messageStatus = status;
+    public void setMessageStatus(MessageStatus messageStatus) {
+        this.messageStatus = messageStatus;
+    }
+
+    public void incrementNumberOfReceptions() {
+        numberOfReceptions++;
+        if (numberOfReceptions == this.thread.getGroup().getUserSet().size() + 1) {
+            this.messageStatus = MessageStatus.RECEIVED_BY_ALL_USERS;
+        }
+    }
+
+    public void incrementNumberOfReads() {
+        numberOfReads++;
+        if (numberOfReads == this.thread.getGroup().getUserSet().size() + 1) {
+            this.messageStatus = MessageStatus.READ_BY_ALL_USERS;
+        }
     }
 
     public int getNumberOfReceptions() {
@@ -68,20 +92,6 @@ public class Message implements Serializable, Comparable<Message> {
 
     public void setNumberOfReads(int numberOfReads) {
         this.numberOfReads = numberOfReads;
-    }
-
-    public void incrementNumberOfReceptions() {
-        numberOfReceptions++;
-        if (numberOfReceptions == this.thread.getGroup().getUserList().size() + 1) {
-            this.messageStatus = MessageStatus.RECEIVED_BY_ALL_USERS;
-        }
-    }
-
-    public void incrementNumberOfReads() {
-        numberOfReads++;
-        if (numberOfReads == this.thread.getGroup().getUserList().size() + 1) {
-            this.messageStatus = MessageStatus.READ_BY_ALL_USERS;
-        }
     }
 
     @Override

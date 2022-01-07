@@ -1,16 +1,18 @@
 package client;
 
 import object.*;
+import object.Thread;
 import server.ConnexionRefusedException;
 import server.ServerInterface;
-import utils.IdGenerator;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.NavigableSet;
+import java.util.Scanner;
 
 public class Client implements ClientInterface {
     private static User user = null;
@@ -25,17 +27,15 @@ public class Client implements ClientInterface {
             // Connexion au serveur
             Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
             stubServer = (ServerInterface) registry.lookup("ServerInterface");
-            user = new CampusUser(IdGenerator.idGenerator("tony", "defreitas"), "tony", "defreitas");
-            stubServer.register(user); // TODO pas normal de se connecter avec un user, associé stubClient et user
-                                       // directement
             System.err.println("Client connecté au serveur avec succès" +
-                    "\n\tAdresse Ip client : " + Inet4Address.getLocalHost().getHostAddress() +
+                    "\n\tAdresse Ip client : " + InetAddress.getLocalHost().getHostAddress() +
                     "\n\tAdresse Ip serveur : " + serverIp +
                     "\n\tPort d'entrée client : " + clientPort +
                     "\n\tPort d'entrée serveur : " + serverPort);
 
             // Connexion au compte de l'utilisateur
             logIn();
+            stubServer.register(user);
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
@@ -54,30 +54,82 @@ public class Client implements ClientInterface {
         }
     }
 
+    private static void signIn() {
+        try (Scanner console = new Scanner(System.in)) {
+            String firstName = console.nextLine();
+            String lastName = console.nextLine();
+            String password1 = console.nextLine();
+            String password2 = console.nextLine();
+
+            try {
+                String username = stubServer.createAccount(firstName, lastName, password1, password2, false);
+                System.out.println(username);
+                System.err.println("Création du compte réussi");
+                user = stubServer.logIn(username, password1);
+                System.err.println("Connexion au compte de l'utilisateur réussi");
+            } catch (Exception e) {
+                System.err.println("Erreur lors de la création du nouveau compte :" + e);
+                e.printStackTrace();
+            }
+        }
+    }
+
     private static void logIn() {
-        SignInInterface signInInterface = new SignInInterface();
-        signInInterface.build();
+        try (// SignInInterface signInInterface = new SignInInterface();
+                Scanner console = new Scanner(System.in)) {
+            String username = console.nextLine();
+            String password = console.nextLine();
 
-        String username = " ";
-        String password = " ";
-
-        try {
-            user = stubServer.logIn(username, password);
-            System.err.println("Connexion au compte de l'utilisateur réussi");
-        } catch (ConnexionRefusedException connexionRefusedException) {
-            System.err.println(connexionRefusedException + " : Username et/ou mot de passe incorrect(s)");
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la tentative de connexion : " + e);
-            e.printStackTrace();
+            try {
+                user = stubServer.logIn(username, password);
+                System.err.println("Connexion au compte de l'utilisateur réussi");
+            } catch (ConnexionRefusedException connexionRefusedException) {
+                System.err.println(connexionRefusedException + " : Username et/ou mot de passe incorrect(s)");
+            } catch (Exception e) {
+                System.err.println("Erreur lors de la tentative de connexion : " + e);
+                e.printStackTrace();
+            }
         }
     }
 
     private void logOut() {
         // TODO fermer l'interface graphique du client
+
+        try {
+            stubServer.logOut(user);
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la deconnexion au serveur : " + e);
+            e.printStackTrace();
+        }
+
         user = null;
 
         // Ré ouverture de l'interface de connexion
         logIn();
+    }
+
+    private NavigableSet<Group> getAllGroup() {
+        NavigableSet<Group> groupSet = null;
+        try {
+            groupSet = stubServer.getAllGroup();
+            System.err.println("Tout les groupes ont été obtenus");
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la récupération des groupes :" + e);
+            e.printStackTrace();
+        }
+        return groupSet;
+    }
+
+    private NavigableSet<User> getAllUser() {
+        NavigableSet<User> userSet = null;
+        try {
+            userSet = stubServer.getAllUser();
+            System.err.println("Tout les utilisateurs ont été obtenus");
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la récupération des utilisateurs :" + e);
+            e.printStackTrace();
+        }
+        return userSet;
     }
 
     public static void main(String[] args) {
@@ -87,26 +139,47 @@ public class Client implements ClientInterface {
 
     @Override
     public void ping() throws RemoteException {
-        stubServer.pong();
+        try {
+            stubServer.pong();
+        } catch (Exception e) {
+            System.err.println("Le serveur ne répond pas : " + e);
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void messageSendToUsers() throws RemoteException {
-
+    public void messageSendToAllUsers(Message message) throws RemoteException {
+        message.setMessageStatus(MessageStatus.RECEIVED_BY_ALL_USERS);
+        // TODO update interface graphique
     }
 
     @Override
-    public void messageReadByUsers() throws RemoteException {
-
+    public void messageReadByAllUsers(Message message) throws RemoteException {
+        message.setMessageStatus(MessageStatus.READ_BY_ALL_USERS);
+        // TODO update interface graphique
     }
 
     @Override
     public void inCommingMessage(Message message) throws RemoteException {
+        // Update local du thread
+        Thread thread = message.getThread();
+        Group group = thread.getGroup();
 
+        for (Group g : user.getGroupSet()) {
+            if (g.equals(group)) {
+                group = g;
+                break;
+            }
+        }
+
+        group.getThreadSet().remove(thread);
+        thread.addMessage(message);
+        group.addThread(thread);
     }
 
     @Override
     public void update(NavigableSet<Group> groupList) throws RemoteException {
-        user.setGroupList(groupList);
+        user.setGroupSet(groupList);
+        // TODO update interface graphique
     }
 }
