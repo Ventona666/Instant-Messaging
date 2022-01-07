@@ -44,6 +44,15 @@ public class Server implements ServerInterface {
 
             NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupSet();
             stubClient.update(groupList);
+            for(Group group : groupList){
+                for(Thread thread : group.getThreadSet()){
+                    Message lastMessageRead = database.getRead(user.getId(), thread.getId());
+
+                    for(Message message : thread.getMessageList().tailSet(lastMessageRead, false)){
+                        message.incrementNumberOfReceptions();
+                    }
+                }
+            }
 
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
@@ -108,7 +117,20 @@ public class Server implements ServerInterface {
 
     @Override
     public void newThread(Thread thread) throws RemoteException {
-        //TODO update Bdd
+        database.newThread(thread);
+        Group virtualGroup = thread.getGroup();
+        virtualGroup.addUser(thread.getOwner());
+        for(User user : virtualGroup.getUserSet()){
+            if(connectedUsersMap.containsKey(user)){
+                try {
+                    connectedUsersMap.get(user).newThreadCreated(thread);
+                }
+                catch (Exception e){
+                    System.err.println("Impossible d'informer le client du nouveau thread" + e);
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -170,7 +192,10 @@ public class Server implements ServerInterface {
     @Override
     public void addToGroup(User user, Group group) throws RemoteException {
         group.addUser(user);
-        //TODO update du groupe dans la bdd
+        database.newMember(user, group);
+        ClientInterface stubClient = connectedUsersMap.get(user);
+
+        stubClient.addToANewGroup(group);
     }
 
     @Override

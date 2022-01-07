@@ -50,6 +50,9 @@ public class DatabaseInteraction {
                 "CREATE TABLE IF NOT EXISTS MemberT (idUser BIGINT, idGroup BIGINT, PRIMARY KEY (idUser, idGroup), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idGroup) REFERENCES GroupT (idGroup) ON DELETE CASCADE);");
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS ReadT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
+        tablesCreateList.add(
+                "CREATE TABLE IF NOT EXISTS ReceptionT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES ReceptionT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
+
         for (String sql : tablesCreateList) {
             try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                  Statement stmt = con.createStatement();) {
@@ -231,6 +234,16 @@ public class DatabaseInteraction {
 
     public void newMember(User user, Group group) {
         String req = "INSERT INTO MemberT VALUES (" + user.getId() + ", " + group.getId() + ")";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+             Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(req);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void newGroup(Group group){
+        String req = "INSERT INTO GroupT VALUES (" + group.getId() + ", '" + group.getName() + "')";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();) {
             stmt.executeUpdate(req);

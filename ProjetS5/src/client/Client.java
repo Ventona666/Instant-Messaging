@@ -74,6 +74,7 @@ public class Client implements ClientInterface{
             e.printStackTrace();
         }
     }
+
     private static void logIn(){
         //SignInInterface signInInterface = new SignInInterface();
         Scanner console = new Scanner(System.in);
@@ -135,6 +136,7 @@ public class Client implements ClientInterface{
         }
         return userSet;
     }
+
     public static void main(String[] args) {
         bootingClientRegistry();
         connectingToServer();
@@ -185,5 +187,25 @@ public class Client implements ClientInterface{
     public void update(NavigableSet<Group> groupList) throws RemoteException {
         user.setGroupSet(groupList);
         //TODO update interface graphique
+    }
+
+    @Override
+    public void addToANewGroup(Group group) throws RemoteException {
+        user.addGroup(group);
+    }
+
+    @Override
+    public void newThreadCreated(Thread thread) throws RemoteException {
+        Group group = thread.getGroup();
+        for(Group g : user.getGroupSet()){
+            if (g.equals(group)){
+                for(Thread t : g.getThreadSet()){
+                    if(t.equals(thread)){
+                        t.setMessageList(thread.getMessageList());
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
