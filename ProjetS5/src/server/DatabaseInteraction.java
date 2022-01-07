@@ -205,8 +205,8 @@ public class DatabaseInteraction {
     public void newUser(User user, String password) {
         String typeUser = user instanceof CampusUser ? "campus" : "staff";
         String req = "INSERT INTO UserT VALUES (" + user.getId() + ", '" + password + ", '" + user.getFirstName()
-                + "', "
-                + user.getLastName() + ", '" + user.getUsername() + "'', '"
+                + "', '"
+                + user.getLastName() + "', '" + user.getUsername() + "', '"
                 + typeUser + "')";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
