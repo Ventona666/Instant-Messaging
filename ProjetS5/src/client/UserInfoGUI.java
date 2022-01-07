@@ -9,13 +9,13 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import object.Group;
 import object.User;
-import utils.SetToList;
 
 public class UserInfoGUI {
 
@@ -39,7 +39,7 @@ public class UserInfoGUI {
 
     private void setMainFrame() {
         frame = new JFrame("Mes informations");
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.setBounds(100, 100, 700, 450);
         frame.setResizable(false);
         buildMainPane();
@@ -54,7 +54,8 @@ public class UserInfoGUI {
     }
 
     private void buildGroupScrollPane() {
-        Group[] listGroup = (Group[]) SetToList.convert(user.getGroupSet());
+        Group[] listGroup = new Group[user.getGroupSet().size()];
+        listGroup = user.getGroupSet().toArray(listGroup);
         JList<Group> groupJList = new JList<>(listGroup);
         groupScrollPane = new JScrollPane(groupJList);
     }

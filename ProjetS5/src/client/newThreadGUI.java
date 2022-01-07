@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -14,6 +15,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import object.Group;
@@ -36,6 +39,7 @@ public class newThreadGUI {
     private JScrollPane messagePane;
     private JButton newButton;
     private JButton cancelButton;
+    private JPanel centerPanel;
 
     public newThreadGUI(User user) {
         this.user = user;
@@ -94,7 +98,65 @@ public class newThreadGUI {
     }
 
     private void buildCenterPanel() {
-
+        centerPanel = new JPanel();
+        GroupLayout groupLayoutCenter = new GroupLayout(centerPanel);
+        groupLayoutCenter.setHorizontalGroup(
+                groupLayoutCenter.createParallelGroup(Alignment.LEADING)
+                        .addGroup(groupLayoutCenter.createSequentialGroup()
+                                .addGroup(groupLayoutCenter.createParallelGroup(Alignment.LEADING)
+                                        .addGroup(Alignment.TRAILING, groupLayoutCenter.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(newButton)
+                                                .addGap(29)
+                                                .addComponent(cancelButton)
+                                                .addPreferredGap(ComponentPlacement.RELATED))
+                                        .addGroup(groupLayoutCenter.createSequentialGroup()
+                                                .addGap(64)
+                                                .addGroup(groupLayoutCenter.createParallelGroup(Alignment.LEADING)
+                                                        .addComponent(messagePane, 0, 0, Short.MAX_VALUE)
+                                                        .addGroup(groupLayoutCenter.createSequentialGroup()
+                                                                .addGroup(
+                                                                        groupLayoutCenter
+                                                                                .createParallelGroup(Alignment.LEADING)
+                                                                                .addComponent(messageLabel)
+                                                                                .addComponent(threadLabel)
+                                                                                .addComponent(groupLabel))
+                                                                .addGap(18)
+                                                                .addGroup(groupLayoutCenter
+                                                                        .createParallelGroup(Alignment.LEADING, false)
+                                                                        .addComponent(groupComboBox, 0,
+                                                                                GroupLayout.DEFAULT_SIZE,
+                                                                                Short.MAX_VALUE)
+                                                                        .addComponent(threadField,
+                                                                                GroupLayout.DEFAULT_SIZE, 252,
+                                                                                Short.MAX_VALUE))))))
+                                .addContainerGap(87, Short.MAX_VALUE)));
+        groupLayoutCenter.setVerticalGroup(
+                groupLayoutCenter.createParallelGroup(Alignment.LEADING)
+                        .addGroup(groupLayoutCenter.createSequentialGroup()
+                                .addGap(28)
+                                .addGroup(groupLayoutCenter.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(threadLabel)
+                                        .addComponent(threadField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                GroupLayout.PREFERRED_SIZE))
+                                .addGap(18)
+                                .addGroup(groupLayoutCenter.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(groupLabel)
+                                        .addComponent(groupComboBox, GroupLayout.PREFERRED_SIZE,
+                                                GroupLayout.DEFAULT_SIZE,
+                                                GroupLayout.PREFERRED_SIZE))
+                                .addGap(18)
+                                .addComponent(messageLabel)
+                                .addPreferredGap(ComponentPlacement.UNRELATED)
+                                .addComponent(messagePane, GroupLayout.PREFERRED_SIZE, 263,
+                                        GroupLayout.PREFERRED_SIZE)
+                                .addGap(18)
+                                .addGroup(groupLayoutCenter.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(cancelButton)
+                                        .addComponent(newButton))
+                                .addContainerGap()));
+        centerPanel.setLayout(groupLayoutCenter);
+        mainPane.add(centerPanel, BorderLayout.CENTER);
     }
 
     public void build() {

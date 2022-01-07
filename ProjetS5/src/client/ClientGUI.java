@@ -232,5 +232,6 @@ public class ClientGUI {
                 "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
         new ClientGUI(user).build();
         new UserInfoGUI(user2).build();
+        new newThreadGUI(user).build();
     }
 }
