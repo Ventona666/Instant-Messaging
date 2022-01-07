@@ -204,7 +204,7 @@ public class DatabaseInteraction {
 
     public void newUser(User user, String password) {
         String typeUser = user instanceof CampusUser ? "campus" : "staff";
-        String req = "INSERT INTO UserT VALUES (" + user.getId() + ", '" + password + ", '" + user.getFirstName()
+        String req = "INSERT INTO UserT VALUES (" + user.getId() + ", '" + password + "', '" + user.getFirstName()
                 + "', '"
                 + user.getLastName() + "', '" + user.getUsername() + "', '"
                 + typeUser + "')";
