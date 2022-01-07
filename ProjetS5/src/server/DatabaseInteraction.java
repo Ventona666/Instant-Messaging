@@ -64,10 +64,12 @@ public class DatabaseInteraction {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
         String passwordEnter = new String(hash, StandardCharsets.UTF_8);
-        String req = "SELECT idUser, passwordUser FROM UserT WHERE username=" + username;
+        String req = "SELECT passwordUser, idUser FROM UserT WHERE username=" + "\"" + username + "\"";
+        System.out.println(req);
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             if (passwordEnter.equals(rs.getString("passwordUser")))
                 return getUser(rs.getLong("idUser"));
             else
@@ -187,6 +189,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             String firstName = rs.getString("firstNameUser");
             String lastName = rs.getString("lastNameUser");
             String username = rs.getString("username");
@@ -202,7 +205,11 @@ public class DatabaseInteraction {
         }
     }
 
-    public void newUser(User user, String password) {
+    public void newUser(User user, String password) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+        password = new String(hash, StandardCharsets.UTF_8);
+
         String typeUser = user instanceof CampusUser ? "campus" : "staff";
         String req = "INSERT INTO UserT VALUES (" + user.getId() + ", '" + password + "', '" + user.getFirstName()
                 + "', '"

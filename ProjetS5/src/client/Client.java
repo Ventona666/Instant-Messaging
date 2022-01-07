@@ -33,7 +33,7 @@ public class Client implements ClientInterface{
                     "\n\tPort d'entrée serveur : " + serverPort);
 
             // Connexion au compte de l'utilisateur
-            signIn();
+            logIn();
             stubServer.register(user);
         }
         catch (Exception e){

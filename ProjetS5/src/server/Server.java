@@ -124,7 +124,13 @@ public class Server implements ServerInterface {
         User newCampusUser = new CampusUser(firstName, lastName);
 
         if(password1.equals(password2)) {
-            database.newUser(newCampusUser, password1);
+            try {
+                database.newUser(newCampusUser, password1);
+            }
+            catch (NoSuchAlgorithmException noSuchAlgorithmException){
+                System.err.println("Erreur lors du hashage du mot de passe : " + noSuchAlgorithmException);
+                noSuchAlgorithmException.printStackTrace();
+            }
         }
 
         return newCampusUser.getUsername();
