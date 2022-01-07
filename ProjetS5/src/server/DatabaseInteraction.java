@@ -85,6 +85,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             Group group = getGroup(rs.getLong("idGroup"));
             User user = getUser(rs.getLong("idUser"));
             return new Thread(idThread, rs.getString("titleThread"), user, group);
@@ -110,6 +111,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             User sender = getUser(rs.getLong("idSender"));
             Thread thread = getThread(rs.getLong("idThread"));
             Message message = new Message(idMessage, rs.getDate("dateMessage"), sender, rs.getString("textMessage"),
@@ -155,6 +157,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             return getMessage(rs.getLong("idMessage"));
         } catch (SQLException e) {
             e.printStackTrace();
@@ -272,6 +275,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             String name = rs.getString("nameGroup");
             Group group = new Group(idGroup, name);
             for (User u : getUserGroup(idGroup))
