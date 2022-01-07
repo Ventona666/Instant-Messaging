@@ -5,9 +5,8 @@ import server.ServerInterface;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.NavigableSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
-
-import static utils.IdGenerator.idGenerator;
 
 public abstract class User implements Serializable, Comparable<User> {
     private final long id;
@@ -16,6 +15,7 @@ public abstract class User implements Serializable, Comparable<User> {
     private final String username;
     protected ServerInterface stubServer;
     private NavigableSet<Group> groupSet = new TreeSet<>();
+    private NavigableSet<Thread> threadCreated = new TreeSet<>();
 
 
 
@@ -43,6 +43,8 @@ public abstract class User implements Serializable, Comparable<User> {
         return username;
     }
 
+
+
     public void setStubServer(ServerInterface stubServer) {
         this.stubServer = stubServer;
     }
@@ -57,6 +59,33 @@ public abstract class User implements Serializable, Comparable<User> {
 
     public boolean addGroup(Group groupToAdd){
         return groupSet.add(groupToAdd);
+    }
+
+    public void addThread(Thread thread) {
+        threadCreated.add(thread);
+    }
+
+    public TreeMap<Group, TreeSet<Thread>> getAllThread() {
+        TreeMap<Group, TreeSet<Thread>> threadList = new TreeMap<>();
+        TreeSet<Thread> tempList;
+        for (Group g : groupSet) {
+            if (!threadList.containsKey(g)) {
+                tempList = new TreeSet<>();
+                threadList.put(g, tempList);
+            } else
+                tempList = threadList.get(g);
+            tempList.addAll(g.getThreadSet());
+        }
+        for (Thread t : threadCreated) {
+            if (threadList.containsKey(t.getGroup()))
+                tempList = threadList.get(t.getGroup());
+            else {
+                tempList = new TreeSet<>();
+                threadList.put(t.getGroup(), tempList);
+            }
+            tempList.add(t);
+        }
+        return threadList;
     }
 
     public void sendMessage(String text, Thread thread){

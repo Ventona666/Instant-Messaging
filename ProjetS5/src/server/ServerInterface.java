@@ -7,6 +7,7 @@ import object.User;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.NavigableSet;
 
 public interface ServerInterface extends Remote {
     void register(User user) throws RemoteException;
@@ -22,4 +23,6 @@ public interface ServerInterface extends Remote {
     void logOut(User user) throws  RemoteException;
     void addToGroup(User user, Group group) throws RemoteException;
     void removeFromGroup(User user, Group group) throws RemoteException;
+    NavigableSet<Group> getAllGroup() throws RemoteException;
+    NavigableSet<User> getAllUser() throws RemoteException;
 }

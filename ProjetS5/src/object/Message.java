@@ -71,16 +71,32 @@ public class Message implements Serializable, Comparable<Message> {
 
     public void incrementNumberOfReceptions() {
         numberOfReceptions++;
-        if (numberOfReceptions == this.thread.getGroup().getUserList().size() + 1) {
+        if (numberOfReceptions == this.thread.getGroup().getUserSet().size() + 1) {
             this.messageStatus = MessageStatus.RECEIVED_BY_ALL_USERS;
         }
     }
 
     public void incrementNumberOfReads() {
         numberOfReads++;
-        if (numberOfReads == this.thread.getGroup().getUserList().size() + 1) {
+        if (numberOfReads == this.thread.getGroup().getUserSet().size() + 1) {
             this.messageStatus = MessageStatus.READ_BY_ALL_USERS;
         }
+    }
+
+    public int getNumberOfReceptions() {
+        return numberOfReceptions;
+    }
+
+    public void setNumberOfReceptions(int numberOfReceptions) {
+        this.numberOfReceptions = numberOfReceptions;
+    }
+
+    public int getNumberOfReads() {
+        return numberOfReads;
+    }
+
+    public void setNumberOfReads(int numberOfReads) {
+        this.numberOfReads = numberOfReads;
     }
 
     @Override

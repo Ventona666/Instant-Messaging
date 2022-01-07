@@ -50,7 +50,7 @@ public class Thread implements Comparable<Thread> {
         this.messageList = messageList;
     }
 
-    public void addMessageList(Message message) {
+    public void addMessage(Message message) {
         this.messageList.add(message);
     }
 
@@ -73,5 +73,10 @@ public class Thread implements Comparable<Thread> {
     @Override
     public int hashCode(){
         return 31 * title.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 }

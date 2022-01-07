@@ -10,8 +10,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashSet;
 import java.util.NavigableSet;
+import java.util.Scanner;
 
 public class Client implements ClientInterface{
     private static User user = null;
@@ -26,8 +26,6 @@ public class Client implements ClientInterface{
             // Connexion au serveur
             Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
             stubServer = (ServerInterface) registry.lookup("ServerInterface");
-            user = new CampusUser("tony", "defreitas");
-            stubServer.register(user); // TODO pas normal de se connecter avec un user, associé stubClient et user directement
             System.err.println("Client connecté au serveur avec succès" +
                     "\n\tAdresse Ip client : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tAdresse Ip serveur : " + serverIp +
@@ -35,7 +33,8 @@ public class Client implements ClientInterface{
                     "\n\tPort d'entrée serveur : " + serverPort);
 
             // Connexion au compte de l'utilisateur
-            logIn();
+            signIn();
+            stubServer.register(user);
         }
         catch (Exception e){
             System.err.println("Client exception: " + e.toString());
@@ -56,12 +55,30 @@ public class Client implements ClientInterface{
         }
     }
 
-    private static void logIn(){
-        SignInInterface signInInterface= new SignInInterface();
-        signInInterface.build();
+    private static void signIn(){
+        Scanner console = new Scanner(System.in);
+        String firstName =  console.nextLine();
+        String lastName =  console.nextLine();
+        String password1 =  console.nextLine();
+        String password2 =  console.nextLine();
 
-        String username = " ";
-        String password = " ";
+        try {
+            String username = stubServer.createAccount(firstName, lastName, password1, password2);
+            System.out.println(username);
+            System.err.println("Création du compte réussi");
+            user = stubServer.logIn(username, password1);
+            System.err.println("Connexion au compte de l'utilisateur réussi");
+        }
+        catch (Exception e){
+            System.err.println("Erreur lors de la création du nouveau compte :" + e);
+            e.printStackTrace();
+        }
+    }
+    private static void logIn(){
+        //SignInInterface signInInterface = new SignInInterface();
+        Scanner console = new Scanner(System.in);
+        String username = console.nextLine();
+        String password = console.nextLine();
 
         try {
             user = stubServer.logIn(username, password);
@@ -93,6 +110,31 @@ public class Client implements ClientInterface{
         logIn();
     }
 
+    private NavigableSet<Group> getAllGroup(){
+        NavigableSet<Group> groupSet = null;
+        try{
+            groupSet = stubServer.getAllGroup();
+            System.err.println("Tout les groupes ont été obtenus");
+        }
+        catch(Exception e){
+            System.err.println("Erreur lors de la récupération des groupes :" + e);
+            e.printStackTrace();
+        }
+        return groupSet;
+    }
+
+    private NavigableSet<User> getAllUser(){
+        NavigableSet<User> userSet = null;
+        try{
+            userSet = stubServer.getAllUser();
+            System.err.println("Tout les utilisateurs ont été obtenus");
+        }
+        catch(Exception e){
+            System.err.println("Erreur lors de la récupération des utilisateurs :" + e);
+            e.printStackTrace();
+        }
+        return userSet;
+    }
     public static void main(String[] args) {
         bootingClientRegistry();
         connectingToServer();
@@ -135,7 +177,7 @@ public class Client implements ClientInterface{
         }
 
         group.getThreadSet().remove(thread);
-        thread.addMessageList(message);
+        thread.addMessage(message);
         group.addThread(thread);
     }
 

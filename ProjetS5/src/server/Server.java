@@ -3,7 +3,6 @@ package server;
 import object.*;
 import client.ClientInterface;
 import object.Thread;
-import utils.IdGenerator;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
@@ -43,8 +42,8 @@ public class Server implements ServerInterface {
             stubClient.ping();
             connectedUsersMap.put(user, stubClient);
 
-            //NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupList();
-            //stubClient.update(groupList);
+            NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupSet();
+            stubClient.update(groupList);
 
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
@@ -122,20 +121,18 @@ public class Server implements ServerInterface {
     @Override
     public String createAccount(String firstName, String lastName, String password1, String password2) throws RemoteException {
         //Generation du pseudo
-        char[] threeChars = new char[3];
-        lastName.getChars(0,3, threeChars, 0);
-        String username = firstName.toLowerCase() + threeChars.toString().toUpperCase();
-        User user = new CampusUser(IdGenerator.idGenerator(firstName, lastName), firstName, lastName, username);
+        User newCampusUser = new CampusUser(firstName, lastName);
 
-        if (password1.equals(password2)){
-            database.newUser(user, password1);
+        if(password1.equals(password2)) {
+            database.newUser(newCampusUser, password1);
         }
-        return username;
+
+        return newCampusUser.getUsername();
     }
 
     @Override
     public void deleteAccount(String userName, String password) throws RemoteException {
-        database.deleteAccount(userName, password);
+        //TODO suppression dans la bdd
     }
 
     @Override
@@ -168,5 +165,16 @@ public class Server implements ServerInterface {
     public void removeFromGroup(User user, Group group) throws RemoteException {
         group.removeUser(user);
         //TODO update du groupe dans la bdd
+    }
+
+    @Override
+    public NavigableSet<Group> getAllGroup() throws RemoteException {
+        return database.getAllGroup();
+    }
+
+    @Override
+    public NavigableSet<User> getAllUser() throws RemoteException {
+        //return database.getAllUser();
+        return null;
     }
 }
