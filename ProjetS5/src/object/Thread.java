@@ -63,6 +63,15 @@ public class Thread implements Comparable<Thread> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Thread) {
+            Thread t = (Thread) obj;
+            return getId() == t.getId();
+        }
+        return false;
+    }
+
+    @Override
     public int compareTo(Thread thread) {
         if (id < thread.getId()) {
             return -1;

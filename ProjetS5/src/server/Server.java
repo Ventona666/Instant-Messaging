@@ -34,7 +34,6 @@ public class Server implements ServerInterface {
     @Override
     public void register(User user) throws RemoteException {
         try {
-
             String host = RemoteServer.getClientHost();
             Registry registry = LocateRegistry.getRegistry(host, 5098);
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
@@ -46,9 +45,9 @@ public class Server implements ServerInterface {
             stubClient.update(groupList);
             for(Group group : groupList){
                 for(Thread thread : group.getThreadSet()){
-                    Message lastMessageRead = database.getRead(user.getId(), thread.getId());
+                    Message lastMessageReceived = database.getReceive(user.getId(), thread.getId());
 
-                    for(Message message : thread.getMessageList().tailSet(lastMessageRead, false)){
+                    for(Message message : thread.getMessageList().tailSet(lastMessageReceived, false)){
                         message.incrementNumberOfReceptions();
                     }
                 }
@@ -101,6 +100,7 @@ public class Server implements ServerInterface {
     public void hasRead(User user, int idMessage) throws RemoteException {
         Message message = database.getMessage(idMessage);
         message.incrementNumberOfReads();
+        database.updateRead(user, message.getThread(), message);
     }
 
     @Override

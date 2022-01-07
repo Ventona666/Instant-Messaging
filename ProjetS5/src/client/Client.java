@@ -173,8 +173,12 @@ public class Client implements ClientInterface{
 
         for(Group g : user.getGroupSet()){
             if(g.equals(group)){
-                group = g;
-                break;
+                for(Thread t : g.getThreadSet()){
+                    if(t.equals(thread)){
+                        t.addMessage(message);
+                        break;
+                    }
+                }
             }
         }
 
