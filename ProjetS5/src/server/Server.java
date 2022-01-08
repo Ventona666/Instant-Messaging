@@ -48,7 +48,7 @@ public class Server implements ServerInterface {
                     Message lastMessageReceived = database.getReceive(user.getId(), thread.getId());
 
                     for(Message message : thread.getMessageList().tailSet(lastMessageReceived, false)){
-                        message.incrementNumberOfReceptions();
+                        message.incrementNumberOfReceptions(group.getNumberOfMember());
                     }
                 }
             }
@@ -74,10 +74,12 @@ public class Server implements ServerInterface {
 
     @Override
     public void sendMessage(Message message) throws RemoteException {
-        Thread thread = message.getThread();
+        long idThread = message.getIdThread();
+        Thread thread = database.getThread(idThread);
 
         /// Création d'un groupe virtuel afin d'envoyer le message à tout les users du thread
-        Group virtualGroup = thread.getGroup();
+        long idGroup = thread.getIdGroup();
+        Group virtualGroup = database.getGroup(idGroup);
         virtualGroup.addUser(thread.getOwner());
 
         //TODO méthode pour replace le thread dans la bdd
@@ -86,7 +88,7 @@ public class Server implements ServerInterface {
             if(connectedUsersMap.containsKey(user)){
                 try {
                     connectedUsersMap.get(user).inCommingMessage(message);
-                    message.incrementNumberOfReceptions();
+                    message.incrementNumberOfReceptions(virtualGroup.getNumberOfMember());
                 }
                 catch (Exception e){
                     System.err.println("Envoi du message impossible à un client" + e);
@@ -97,10 +99,13 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void hasRead(User user, int idMessage) throws RemoteException {
-        Message message = database.getMessage(idMessage);
-        message.incrementNumberOfReads();
-        database.updateRead(user, message.getThread(), message);
+    public void hasRead(long userId, long messageId) throws RemoteException {
+        Message message = database.getMessage(messageId);
+        Thread thread = database.getThread(message.getIdThread());
+        Group group = database.getGroup(thread.getIdGroup());
+
+        message.incrementNumberOfReads(group.getNumberOfMember());
+        database.updateRead(userId, messageId);
     }
 
     @Override
@@ -118,7 +123,8 @@ public class Server implements ServerInterface {
     @Override
     public void newThread(Thread thread) throws RemoteException {
         database.newThread(thread);
-        Group virtualGroup = thread.getGroup();
+        long idGroup = thread.getIdGroup();
+        Group virtualGroup = database.getGroup(idGroup);
         virtualGroup.addUser(thread.getOwner());
         for(User user : virtualGroup.getUserSet()){
             if(connectedUsersMap.containsKey(user)){

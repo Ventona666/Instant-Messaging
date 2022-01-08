@@ -13,7 +13,7 @@ public interface ServerInterface extends Remote {
     void register(User user) throws RemoteException;
     void unregister(User user) throws RemoteException;
     void sendMessage(Message message) throws RemoteException;
-    void hasRead(User user, int idMessage) throws RemoteException;
+    void hasRead(long userId, long messageId) throws RemoteException;
     void pong() throws RemoteException;
     void newThread(Thread thread) throws RemoteException;
     void closeThread(int idThread) throws RemoteException;

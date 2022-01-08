@@ -39,7 +39,7 @@ public class DatabaseInteraction {
     public void initialisation() {
         List<String> tablesCreateList = new ArrayList<String>();
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS GroupT (idGroup BIGINT, nameGroup VARCHAR(255), PRIMARY KEY (idGroup));");
+                "CREATE TABLE IF NOT EXISTS GroupT (idGroup BIGINT, nameGroup VARCHAR(255), numberOfMember BIGINT, PRIMARY KEY (idGroup));");
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS UserT (idUser BIGINT, passwordUser VARCHAR(255), firstNameUser VARCHAR(255), lastNameUser VARCHAR(255), username VARCHAR(255), typeUser VARCHAR(20), PRIMARY KEY (idUser));");
         tablesCreateList.add(
@@ -89,9 +89,9 @@ public class DatabaseInteraction {
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
-            Group group = getGroup(rs.getLong("idGroup"));
+            long idGroup = rs.getLong("idGroup");
             User user = getUser(rs.getLong("idUser"));
-            return new Thread(idThread, rs.getString("titleThread"), user, group);
+            return new Thread(idThread, rs.getString("titleThread"), user, idGroup);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -100,7 +100,7 @@ public class DatabaseInteraction {
 
     public void newThread(Thread thread) {
         String req = "INSERT INTO ThreadT VALUES (" + thread.getId() + ", '" + thread.getTitle() + "', "
-                + thread.getOwner().getId() + ", " + thread.getGroup().getId() + ")";
+                + thread.getOwner().getId() + ", " + thread.getIdGroup() + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();) {
             stmt.executeUpdate(req);
@@ -115,10 +115,9 @@ public class DatabaseInteraction {
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
-            User sender = getUser(rs.getLong("idSender"));
-            Thread thread = getThread(rs.getLong("idThread"));
-            Message message = new Message(idMessage, rs.getDate("dateMessage"), sender, rs.getString("textMessage"),
-                    thread);
+            long idSender = rs.getLong("idSender");
+            long idThread = rs.getLong("idThread");
+            Message message = new Message(idMessage, rs.getDate("dateMessage"), idSender, rs.getString("textMessage"), idThread);
             message.setMessageStatus(MessageStatus.values()[rs.getInt("statusMessage")]);
             message.setNumberOfReceptions(rs.getInt("nbReMessage"));
             message.setNumberOfReads(rs.getInt("nbRdMessage"));
@@ -131,9 +130,9 @@ public class DatabaseInteraction {
 
     public void newMessage(Message message) {
         String sql = "INSERT INTO MessageT VALUES (" + message.getId() + ", '" + message.getDate() + "', "
-                + message.getSender().getId() + ", '" + message.getText() + "', " + message.getNumberOfReads()
+                + message.getIdSender() + ", '" + message.getText() + "', " + message.getNumberOfReads()
                 + ", " + message.getNumberOfReceptions() + ", " + message.getMessageStatus().ordinal()
-                + ", " + message.getThread().getId() + ")";
+                + ", " + message.getIdThread() + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
@@ -168,9 +167,10 @@ public class DatabaseInteraction {
         }
     }
 
-    public void updateRead(User user, Thread thread, Message message) {
-        String sql = "UPDATE ReadT WHERE idUser=" + user.getId() + " AND idThread=" + thread.getId() + " SET idMessage="
-                + message.getId();
+    public void updateRead(long idUser, long idMessage) {
+        long idThread = getMessage(idMessage).getIdThread();
+        String sql = "UPDATE ReadT WHERE idUser=" + idUser + " AND idThread=" + idThread + " SET idMessage="
+                + idMessage;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
@@ -324,7 +324,8 @@ public class DatabaseInteraction {
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
             String name = rs.getString("nameGroup");
-            Group group = new Group(idGroup, name);
+            int numberOfMember = rs.getInt("numberOfMember");
+            Group group = new Group(idGroup, name, numberOfMember);
             for (User u : getUserGroup(idGroup))
                 group.addUser(u);
             for (Thread t : getThreadGroup(idGroup))
@@ -348,6 +349,19 @@ public class DatabaseInteraction {
             e.printStackTrace();
         }
         return listUser;
+    }
+
+    private int getNumberOfMember(long idGroup){
+        String req = "SELECT numberOfMember FROM GroupT WHERE idGroup=" + idGroup;
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
+            return rs.getInt("numberOfMember");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     private NavigableSet<Thread> getThreadGroup(long idGroup) {

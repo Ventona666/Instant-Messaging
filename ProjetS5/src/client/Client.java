@@ -33,7 +33,7 @@ public class Client implements ClientInterface{
                     "\n\tPort d'entrée serveur : " + serverPort);
 
             // Connexion au compte de l'utilisateur
-            logIn();
+            signIn();
             stubServer.register(user);
         }
         catch (Exception e){
@@ -168,23 +168,15 @@ public class Client implements ClientInterface{
     @Override
     public void inCommingMessage(Message message) throws RemoteException {
         // Update local du thread
-        Thread thread = message.getThread();
-        Group group = thread.getGroup();
-
-        for(Group g : user.getGroupSet()){
-            if(g.equals(group)){
-                for(Thread t : g.getThreadSet()){
-                    if(t.equals(thread)){
-                        t.addMessage(message);
-                        break;
-                    }
+        long idThread = message.getIdThread();
+        for(Group group : user.getGroupSet()){
+            for(Thread thread : group.getThreadSet()){
+                if(thread.getId() == idThread){
+                    thread.addMessage(message);
+                    break;
                 }
             }
         }
-
-        group.getThreadSet().remove(thread);
-        thread.addMessage(message);
-        group.addThread(thread);
     }
 
     @Override
@@ -200,9 +192,10 @@ public class Client implements ClientInterface{
 
     @Override
     public void newThreadCreated(Thread thread) throws RemoteException {
-        Group group = thread.getGroup();
+        long idGroup = thread.getIdGroup();
+
         for(Group g : user.getGroupSet()){
-            if (g.equals(group)){
+            if (g.getId() == idGroup){
                 for(Thread t : g.getThreadSet()){
                     if(t.equals(thread)){
                         t.setMessageList(thread.getMessageList());

@@ -10,10 +10,12 @@ public class Group implements Comparable<Group> {
     private String name;
     private NavigableSet<User> userSet = new TreeSet<>();
     private NavigableSet<Thread> threadSet = new TreeSet<>();
+    private int numberOfMember = 0;
 
-    public Group(long id, String name) {
+    public Group(long id, String name, int numberOfMember) {
         this.id = id;
         this.name = name;
+        this.numberOfMember = numberOfMember;
     }
 
     public Group(String name){
@@ -27,6 +29,10 @@ public class Group implements Comparable<Group> {
 
     public String getName() {
         return name;
+    }
+
+    public int getNumberOfMember() {
+        return numberOfMember;
     }
 
     public void setName(String name) {

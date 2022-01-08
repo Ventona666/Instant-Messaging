@@ -248,6 +248,7 @@ public class GraphicsClientInterface {
     }
 
     public static void main(String[] args) {
+        /*
         CampusUser user = new CampusUser(1, "Sabrina", "Sikder", "sabrinaSI");
         CampusUser user2 = new CampusUser(2, "Hugo", "Deleye", "hugoDE");
         Group student = new Group(0, "Étudiant");
@@ -276,5 +277,6 @@ public class GraphicsClientInterface {
         th3.addMessage(new Message(3, new Date(), user2,
                 "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
         new GraphicsClientInterface(user);
+        */
     }
 }

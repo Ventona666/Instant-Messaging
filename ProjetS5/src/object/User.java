@@ -56,32 +56,20 @@ public abstract class User implements Serializable, Comparable<User> {
         return groupSet.add(groupToAdd);
     }
 
-    public TreeMap<Group, TreeSet<Thread>> getAllThread() {
-        TreeMap<Group, TreeSet<Thread>> threadList = new TreeMap<>();
-        TreeSet<Thread> tempList;
-        for (Group g : groupSet) {
-            if (!threadList.containsKey(g)) {
-                tempList = new TreeSet<>();
-                threadList.put(g, tempList);
-            } else
-                tempList = threadList.get(g);
-            tempList.addAll(g.getThreadSet());
+    public TreeMap<Group, TreeSet<Thread>> getAllThread(){
+        TreeMap<Group, TreeSet<Thread>> groupThreadTreeMap = new TreeMap<>();
+        TreeSet<Thread> threadTreeSet = new TreeSet<>();;
+        for(Group g : groupSet){
+            threadTreeSet.addAll(g.getThreadSet());
+            groupThreadTreeMap.put(g, threadTreeSet);
+            threadTreeSet = new TreeSet<>();
         }
-        for (Thread t : createdThreadSet) {
-            if (threadList.containsKey(t.getGroup()))
-                tempList = threadList.get(t.getGroup());
-            else {
-                tempList = new TreeSet<>();
-                threadList.put(t.getGroup(), tempList);
-            }
-            tempList.add(t);
-        }
-        return threadList;
+        return groupThreadTreeMap;
     }
 
     public void sendMessage(String text, Thread thread){
         try {
-            Message message = new Message(new Date(), this, text, thread);
+            Message message = new Message(new Date(), this.id, text, thread.getId());
             stubServer.sendMessage(message);
             System.err.println("Message envoyé au serveur avec succès");
         }
@@ -93,7 +81,7 @@ public abstract class User implements Serializable, Comparable<User> {
 
     public void newThread(String title, Group group){
         try{
-            Thread thread = new Thread(title, this, group);
+            Thread thread = new Thread(title, this, group.getId());
             stubServer.newThread(thread);
 
             if(!group.getUserSet().contains(this)){
