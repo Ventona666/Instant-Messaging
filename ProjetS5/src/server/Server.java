@@ -90,6 +90,11 @@ public class Server implements ServerInterface {
                 try {
                     connectedUsersMap.get(user).inCommingMessage(message);
                     message.incrementNumberOfReceptions(virtualGroup.getNumberOfMember());
+                    if(message.getNumberOfReceptions() == virtualGroup.getNumberOfMember()){
+                        for(ClientInterface stubClient : connectedUsersMap.values()){
+                            stubClient.messageSendToAllUsers(message);
+                        }
+                    }
                 }
                 catch (Exception e){
                     System.err.println("Envoi du message impossible à un client" + e);

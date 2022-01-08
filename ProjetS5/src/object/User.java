@@ -56,8 +56,8 @@ public abstract class User implements Serializable, Comparable<User> {
         this.groupSet = groupSet;
     }
 
-    public boolean addGroup(Group groupToAdd){
-        return groupSet.add(groupToAdd);
+    public void addGroup(Group groupToAdd){
+        groupSet.add(groupToAdd);
     }
 
     public TreeMap<Group, TreeSet<Thread>> getAllThread(){
