@@ -34,7 +34,7 @@ public class Client implements ClientInterface{
 
             // Connexion au compte de l'utilisateur
             signIn();
-            stubServer.register(user);
+            stubServer.register(user.getId());
         }
         catch (Exception e){
             System.err.println("Client exception: " + e.toString());
@@ -177,12 +177,6 @@ public class Client implements ClientInterface{
                 }
             }
         }
-    }
-
-    @Override
-    public void update(NavigableSet<Group> groupList) throws RemoteException {
-        user.setGroupSet(groupList);
-        //TODO update interface graphique
     }
 
     @Override

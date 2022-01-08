@@ -8,11 +8,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.*;
 
+import com.sun.source.tree.Tree;
 import object.CampusUser;
 import object.Group;
 import object.Message;
@@ -238,6 +236,7 @@ public class DatabaseInteraction {
             else
                 user = new StaffUser(idUser, firstName, lastName, username);
             user.setGroupSet(getGroupUser(idUser));
+            user.setGroupThreadSetMap(getThreadOwner(idUser));
             return user;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -376,6 +375,32 @@ public class DatabaseInteraction {
             e.printStackTrace();
         }
         return listThread;
+    }
+
+    private TreeMap<Group, TreeSet<Thread>> getThreadOwner(long idUser){
+        //Permet de récuperer tout les threads créé par un user
+        String req = "SELECT idThread FROM ThreadT WHERE idUser=" + idUser;
+        TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = new TreeMap<>();
+        TreeSet<Thread> threadTreeSet;
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(req);) {
+            while (rs.next()) {
+                Thread thread = getThread(rs.getLong("idGroup"));
+                Group group = getGroup(thread.getIdGroup());
+                if(!groupTreeSetTreeMap.containsKey(group)){
+                    threadTreeSet = new TreeSet<>();
+                }
+                else{
+                    threadTreeSet = groupTreeSetTreeMap.get(group);
+                }
+                threadTreeSet.add(thread);
+                groupTreeSetTreeMap.put(group, threadTreeSet);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return groupTreeSetTreeMap;
     }
 
     public boolean uniqueIdUser(long idUser) {

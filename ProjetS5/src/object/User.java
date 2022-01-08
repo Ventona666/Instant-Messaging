@@ -15,7 +15,7 @@ public abstract class User implements Serializable, Comparable<User> {
     private final String username;
     protected ServerInterface stubServer;
     private NavigableSet<Group> groupSet = new TreeSet<>();
-    private NavigableSet<Thread> createdThreadSet = new TreeSet<>();
+    private TreeMap<Group, TreeSet<Thread>> groupThreadSetMap = new TreeMap<>();
 
     public User(long id, String firstName, String lastName, String username){
         this.id = id;
@@ -44,6 +44,10 @@ public abstract class User implements Serializable, Comparable<User> {
         this.stubServer = stubServer;
     }
 
+    public void setGroupThreadSetMap(TreeMap<Group, TreeSet<Thread>> groupThreadSetMap){
+        this.groupThreadSetMap = groupThreadSetMap;
+    }
+
     public NavigableSet<Group> getGroupSet() {
         return groupSet;
     }
@@ -64,6 +68,7 @@ public abstract class User implements Serializable, Comparable<User> {
             groupThreadTreeMap.put(g, threadTreeSet);
             threadTreeSet = new TreeSet<>();
         }
+        groupThreadTreeMap.putAll(groupThreadSetMap);
         return groupThreadTreeMap;
     }
 
@@ -85,7 +90,9 @@ public abstract class User implements Serializable, Comparable<User> {
             stubServer.newThread(thread);
 
             if(!group.getUserSet().contains(this)){
-                createdThreadSet.add(thread);
+                TreeSet<Thread> threadTreeSet = groupThreadSetMap.get(group);
+                threadTreeSet.add(thread);
+                groupThreadSetMap.put(group, threadTreeSet);
             }
 
             System.err.println("Démarrage d'un nouveau thread réussi");

@@ -8,8 +8,8 @@ import java.util.TreeSet;
 public class Group implements Comparable<Group> {
     private final long id;
     private String name;
-    private NavigableSet<User> userSet = new TreeSet<>();
-    private NavigableSet<Thread> threadSet = new TreeSet<>();
+    private final NavigableSet<User> userSet = new TreeSet<>();
+    private final NavigableSet<Thread> threadSet = new TreeSet<>();
     private int numberOfMember = 0;
 
     public Group(long id, String name, int numberOfMember) {
@@ -43,13 +43,18 @@ public class Group implements Comparable<Group> {
         return userSet;
     }
 
-    public boolean addUser(User userToAdd) {
-        return userSet.add(userToAdd);
+    public void addUser(User userToAdd) {
+        if(userSet.add(userToAdd)){
+            numberOfMember++;
+        }
     }
 
-    public boolean removeUser(User userToDelete){
-        return userSet.remove(userToDelete);
+    public void removeUser(User userToDelete){
+        if(userSet.remove(userToDelete)){
+            numberOfMember--;
+        }
     }
+
     public NavigableSet<Thread> getThreadSet() {
         return threadSet;
     }

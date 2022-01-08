@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class Server implements ServerInterface {
-    private Map<User, ClientInterface> connectedUsersMap = new HashMap<>();
+    private Map<Long, ClientInterface> connectedUsersMap = new HashMap<>();
     private DatabaseInteraction database = new DatabaseInteraction();
 
     public static void main(String[] args) {
@@ -32,20 +32,21 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void register(User user) throws RemoteException {
+    public void register(long idUser) throws RemoteException {
         try {
             String host = RemoteServer.getClientHost();
             Registry registry = LocateRegistry.getRegistry(host, 5098);
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
 
             stubClient.ping();
-            connectedUsersMap.put(user, stubClient);
+            connectedUsersMap.put(idUser, stubClient);
 
-            NavigableSet<Group> groupList = database.getUser(user.getId()).getGroupSet();
-            stubClient.update(groupList);
-            for(Group group : groupList){
-                for(Thread thread : group.getThreadSet()){
-                    Message lastMessageReceived = database.getReceive(user.getId(), thread.getId());
+            User user = database.getUser(idUser);
+            TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = user.getAllThread();
+
+            for(Group group : groupTreeSetTreeMap.keySet()){
+                for(Thread thread : groupTreeSetTreeMap.get(group)){
+                    Message lastMessageReceived = database.getReceive(idUser, thread.getId());
 
                     for(Message message : thread.getMessageList().tailSet(lastMessageReceived, false)){
                         message.incrementNumberOfReceptions(group.getNumberOfMember());
@@ -60,8 +61,8 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void unregister(User user) throws RemoteException {
-        connectedUsersMap.remove(user);
+    public void unregister(long idUser) throws RemoteException {
+        connectedUsersMap.remove(idUser);
         System.err.println("Un client s'est déconnecté\n");
         try{
             String clientIp = RemoteServer.getClientHost();
