@@ -22,7 +22,7 @@ import javax.swing.border.EmptyBorder;
 import object.Group;
 import object.User;
 
-public class newThreadGUI {
+public class NewThreadGUI {
 
     private User user;
 
@@ -41,7 +41,7 @@ public class newThreadGUI {
     private JButton cancelButton;
     private JPanel centerPanel;
 
-    public newThreadGUI(User user) {
+    public NewThreadGUI(User user) {
         this.user = user;
     }
 
