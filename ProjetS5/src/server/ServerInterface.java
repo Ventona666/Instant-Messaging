@@ -21,6 +21,7 @@ public interface ServerInterface extends Remote {
     void deleteAccount(String userName, String password) throws RemoteException;
     User logIn(String username, String password) throws RemoteException, ConnexionRefusedException;
     void logOut(User user) throws  RemoteException;
+    Group getGroup(long idGroup) throws RemoteException;
     void createGroup(Group group) throws RemoteException;
     void addToGroup(User user, Group group) throws RemoteException;
     void removeFromGroup(User user, Group group) throws RemoteException;

@@ -20,9 +20,15 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
 import object.Group;
+import object.Thread;
 import object.User;
 
 public class NewThreadGUI {
+    private Client client;
+
+    public NewThreadGUI(Client client){
+        this.client = client;
+    }
 
     private User user;
 
@@ -92,7 +98,12 @@ public class NewThreadGUI {
         });
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // TODO NEW THREAD
+                String title = threadField.getText();
+                //TODO récuperer le groupe avec la combobox
+                Group group = null;
+                String message = messageTextArea.getText();
+                Thread thread = client.getUser().newThread(title, group);
+                client.getUser().sendMessage(message, thread);
             }
         });
     }

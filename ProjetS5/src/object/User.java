@@ -88,7 +88,7 @@ public abstract class User implements Serializable, Comparable<User> {
         }
     }
 
-    public void newThread(String title, Group group){
+    public Thread newThread(String title, Group group){
         try{
             Thread thread = new Thread(title, this, group.getId());
             stubServer.newThread(thread);
@@ -100,11 +100,13 @@ public abstract class User implements Serializable, Comparable<User> {
             }
 
             System.err.println("Démarrage d'un nouveau thread réussi");
+            return thread;
         }
         catch (Exception e){
             System.err.println("Erreur lors de la création thread : " + e);
             e.printStackTrace();
         }
+        return null;
     }
 
     public void closeThread(int idThread){
@@ -120,16 +122,36 @@ public abstract class User implements Serializable, Comparable<User> {
 
     @Override
     public int compareTo(User user) {
-        if(id < user.getId()){
+        int lastNameDiff = lastName.compareTo(user.lastName);
+        if (lastNameDiff != 0)
+            return lastNameDiff;
+        int firstNameDiff = firstName.compareTo(user.firstName);
+        if (firstNameDiff != 0)
+            return firstNameDiff;
+        if (id < user.id)
             return -1;
-        }
-        else{
+        else if (id > user.id)
             return 1;
+        else
+            return 0;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            User u = (User) obj;
+            return u.getId() == getId() && u.getFirstName() == getFirstName() && u.getLastName() == getLastName();
         }
+        return false;
     }
 
     @Override
     public int hashCode(){
         return 31 * firstName.hashCode() * lastName.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return lastName + " " + firstName;
     }
 }

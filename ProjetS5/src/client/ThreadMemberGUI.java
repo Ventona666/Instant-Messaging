@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import object.Group;
 import object.Thread;
 import object.User;
 
@@ -18,7 +19,7 @@ import javax.swing.WindowConstants;
 public class ThreadMemberGUI extends JFrame {
 
     private Thread thread;
-
+    private Client client;
     // Components
 
     private JFrame frame;
@@ -26,8 +27,9 @@ public class ThreadMemberGUI extends JFrame {
     private JPanel topPanel;
     private JPanel centerPanel;
 
-    public ThreadMemberGUI(Thread thread) {
+    public ThreadMemberGUI(Thread thread, Client client) {
         this.thread = thread;
+        this.client = client;
     }
 
     private void buildComponents() {
@@ -59,14 +61,23 @@ public class ThreadMemberGUI extends JFrame {
     }
 
     private void buildCenterPanel() {
-        /*
         centerPanel = new JPanel();
-        User[] listUser = new User[thread.getParticipantsSet().size()];
-        listUser = thread.getParticipantsSet().toArray(listUser);
-        JList<User> userJList = new JList<>(listUser);
-        JScrollPane scrollPane = new JScrollPane(userJList);
-        centerPanel.add(scrollPane);
-        mainPane.add(centerPanel, BorderLayout.CENTER);*/
+        long idGroup = thread.getIdGroup();
+        try{
+            Group group = client.getUser().getStubServer().getGroup(idGroup);
+            System.err.println("Groupe obtenu avec succès");
+
+            User[] listUser = new User[group.getNumberOfMember() + 1];
+            group.getUserSet().add(client.getUser());
+            listUser = group.getUserSet().toArray(listUser);
+            JList<User> userJList = new JList<>(listUser);
+            JScrollPane scrollPane = new JScrollPane(userJList);
+            centerPanel.add(scrollPane);
+            mainPane.add(centerPanel, BorderLayout.CENTER);
+        } catch (Exception e){
+            System.err.println("Erreur lors de l'obtention du groupe : " + e);
+            e.printStackTrace();
+        }
     }
 
     public void build() {

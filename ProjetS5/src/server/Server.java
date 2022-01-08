@@ -202,6 +202,11 @@ public class Server implements ServerInterface {
     }
 
     @Override
+    public Group getGroup(long idGroup) throws RemoteException {
+        return database.getGroup(idGroup);
+    }
+
+    @Override
     public void createGroup(Group group) throws RemoteException {
         database.newGroup(group);
     }
