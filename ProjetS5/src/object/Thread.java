@@ -49,7 +49,7 @@ public class Thread implements Comparable<Thread> {
     public NavigableSet<User> getParticipantsSet() {
         NavigableSet<User> listUser = new TreeSet<>();
         listUser.addAll(this.group.getUserSet());
-        listUser.add(this.owner);
+        listUser.add(owner);
         return listUser;
     }
 

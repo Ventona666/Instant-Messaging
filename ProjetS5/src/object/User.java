@@ -117,25 +117,32 @@ public abstract class User implements Serializable, Comparable<User> {
 
     @Override
     public int compareTo(User user) {
-        if (id < user.getId()) {
+        int lastNameDiff = lastName.compareTo(user.lastName);
+        if (lastNameDiff != 0)
+            return lastNameDiff;
+        int firstNameDiff = firstName.compareTo(user.firstName);
+        if (firstNameDiff != 0)
+            return firstNameDiff;
+        if (id < user.id)
             return -1;
-        } else {
+        else if (id > user.id)
             return 1;
-        }
+        else
+            return 0;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof User) {
             User u = (User) obj;
-            return u.getId() == getId();
+            return u.getId() == getId() && u.getFirstName() == getFirstName() && u.getLastName() == getLastName();
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return 31 * firstName.hashCode() * lastName.hashCode();
+        return 31 * getFirstName().hashCode() * getLastName().hashCode() * ((Long) getId()).intValue();
     }
 
     @Override
