@@ -53,12 +53,7 @@ public class Message implements Serializable, Comparable<Message> {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", date=" + date +
-                ", idSender=" + idSender +
-                ", text='" + text + '\'' +
-                '}';
+        return text;
     }
 
     public MessageStatus getMessageStatus() {
@@ -107,4 +102,6 @@ public class Message implements Serializable, Comparable<Message> {
             return 1;
         }
     }
+
+
 }
