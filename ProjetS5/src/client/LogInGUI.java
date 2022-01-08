@@ -3,6 +3,8 @@ package client;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -95,6 +97,13 @@ public class LogInGUI {
         gbcConnectButton.insets = new Insets(0, 0, 0, 5);
         gbcConnectButton.gridx = 5;
         gbcConnectButton.gridy = 7;
+        connectButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                char[] password = pwdField.getPassword();
+                // APPEL LOGIN
+            }
+        });
         mainPane.add(connectButton, gbcConnectButton);
     }
 

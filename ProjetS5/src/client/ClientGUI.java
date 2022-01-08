@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -231,5 +232,6 @@ public class ClientGUI {
         th3.addMessage(new Message(3, new Date(), user2,
                 "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
         new LogInGUI().build();
+
     }
 }

@@ -79,7 +79,6 @@ public class Client implements ClientInterface {
                 Scanner console = new Scanner(System.in)) {
             String username = console.nextLine();
             String password = console.nextLine();
-
             try {
                 user = stubServer.logIn(username, password);
                 System.err.println("Connexion au compte de l'utilisateur réussi");

@@ -23,7 +23,6 @@ public class ThreadMemberGUI extends JFrame {
 
     private JFrame frame;
     private JPanel mainPane;
-    private JTable groupScroll;
     private JPanel topPanel;
     private JPanel centerPanel;
 
