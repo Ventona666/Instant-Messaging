@@ -315,6 +315,21 @@ public class DatabaseInteraction {
         return listGroup;
     }
 
+    public NavigableSet<User> getAllUser() {
+        NavigableSet<User> listUser = new TreeSet<>();
+        String req = "SELECT idUser FROM UserT";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(req);) {
+            while (rs.next()) {
+                listUser.add(getUser(rs.getLong("idUser")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listUser;
+    }
+
     public Group getGroup(long idGroup) {
         String req = "SELECT * FROM GroupT WHERE id=" + idGroup;
         // id name user thread

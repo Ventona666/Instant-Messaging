@@ -1,17 +1,14 @@
 package client;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NavigableSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.spi.CurrencyNameProvider;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,16 +19,12 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import object.Group;
@@ -40,10 +33,9 @@ import object.Thread;
 import object.User;
 import object.CampusUser;
 
-public class GraphicsClientInterface {
+public class ClientGUI {
 
-    private User user;
-    private String name;
+    private Client client;
     private Thread currentThread = null;
 
     // Components
@@ -59,14 +51,11 @@ public class GraphicsClientInterface {
     private JScrollPane scrollPane;
     private DefaultTableModel messageModel;
     private JTable messageTable;
-    private JTextPane messageStyleTextPane;
 
     // private Color blue = new Color(16, 79, 85, 255);
 
-    public GraphicsClientInterface(User user) {
-        this.user = user;
-        name = user.getFirstName() + " " + user.getLastName();
-        build();
+    public ClientGUI(Client client) {
+        this.client = client;
     }
 
     private void buildComponents() {
@@ -82,7 +71,7 @@ public class GraphicsClientInterface {
 
     private void setMainFrame() {
         frame = new JFrame("Poucavor 2000");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setMinimumSize(new Dimension(1000, 600));
         frame.setLocationRelativeTo(null);
         frame.setResizable(true);
@@ -135,9 +124,9 @@ public class GraphicsClientInterface {
     private void buildTopPanel() {
         topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        JLabel firstName = new JLabel(user.getFirstName());
+        JLabel firstName = new JLabel(client.getUser().getFirstName());
         topPanel.add(firstName);
-        JLabel lastName = new JLabel(user.getLastName());
+        JLabel lastName = new JLabel(client.getUser().getLastName());
         topPanel.add(lastName);
         JPanel imgUserInfo = new JPanel();
         topPanel.add(imgUserInfo);
@@ -153,7 +142,7 @@ public class GraphicsClientInterface {
 
     private void buildTree() {
         DefaultMutableTreeNode groups = new DefaultMutableTreeNode("Groupes");
-        TreeMap<Group, TreeSet<Thread>> threadList = user.getAllThread();
+        TreeMap<Group, TreeSet<Thread>> threadList = client.getUser().getAllThread();
         for (Group group : threadList.keySet()) {
             DefaultMutableTreeNode groupTemp = new DefaultMutableTreeNode(group.getName());
             if (!threadList.get(group).isEmpty())
@@ -186,7 +175,7 @@ public class GraphicsClientInterface {
         List<Message> messageList = new ArrayList<>(currentThread.getMessageList());
         for (Iterator<Message> it = messageList.listIterator(messageModel.getRowCount()); it.hasNext();) {
             Message currentMessage = it.next();
-            messageModel.addRow(new Object[] { "", currentMessage.getText() });
+            messageModel.addRow(new Object[] { null, currentMessage });
         }
     }
 
@@ -195,47 +184,12 @@ public class GraphicsClientInterface {
             messageModel.removeRow(i);
         }
         for (Message currentMessage : currentThread.getMessageList()) {
-            messageModel.addRow(new Object[] { "", currentMessage.getText() });
+            messageModel.addRow(new Object[] { null, currentMessage });
         }
-        buildMessageStyle();
-        messageModel.addRow(new Object[] { null, messageStyleTextPane });
     }
 
     private void buildMessageStyle() {
-        messageStyleTextPane = new JTextPane();
-        // définition des styles
-        Style defaut = messageStyleTextPane.getStyle("default");
-        Style style1 = messageStyleTextPane.addStyle("style1", defaut);
-        StyleConstants.setFontFamily(style1, "Comic sans MS");
-        Style style2 = messageStyleTextPane.addStyle("style2", style1);
-        StyleConstants.setForeground(style2, Color.RED);
-        StyleConstants.setFontSize(style2, 25);
 
-        String s1 = "Sous le pont Mirabeau coule la Seine " +
-                "Et nos amours " +
-                "Faut-il qu'il m'en souvienne " +
-                "La joie venait toujours après la peine. ";
-        String s2 = "Vienne la nuit sonne l'heure " +
-                "Les jours s'en vont je demeure ";
-        String s3 = "Les mains dans les mains restons face à face " +
-                "Tandis que sous " +
-                "Le pont de nos bras passe " +
-                "Des éternels regards l'onde si lasse. " +
-                "L'amour s'en va comme cette eau courante " +
-                "L'amour s'en va " +
-                "Comme la vie est lente " +
-                "Et comme l'Espérance est violente.";
-        StyledDocument sDoc = (StyledDocument) messageStyleTextPane.getDocument();
-        try {
-            int pos = 0;
-            sDoc.insertString(pos, s1, defaut);
-            pos += s1.length();
-            sDoc.insertString(pos, s2, style1);
-            pos += s2.length();
-            sDoc.insertString(pos, s3, style2);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
     }
 
     private void updateTree() {
@@ -247,36 +201,4 @@ public class GraphicsClientInterface {
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        /*
-        CampusUser user = new CampusUser(1, "Sabrina", "Sikder", "sabrinaSI");
-        CampusUser user2 = new CampusUser(2, "Hugo", "Deleye", "hugoDE");
-        Group student = new Group(0, "Étudiant");
-        Group grp1 = new Group(1, "TDA1");
-        Group grp2 = new Group(2, "TDA2");
-        Group grp3 = new Group(3, "TDA3");
-        Group grp4 = new Group(4, "TDA4");
-        Group grp5 = new Group(5, "TDA5");
-        user.addGroup(grp1);
-        grp1.addUser(user);
-        user.addGroup(student);
-        student.addUser(user);
-        user2.addGroup(grp2);
-        grp2.addUser(user2);
-        user2.addGroup(student);
-        student.addUser(user2);
-        Thread th1 = new Thread(1, "J'ai des soucis avec Christine Sénac", user, grp4);
-        grp4.addThread(th1);
-        user.addThread(th1);
-        th1.addMessage(new Message(1, new Date(), user, "Christine arrête pas de m'embeter", th1));
-        Thread th2 = new Thread(2, "caca", user, student);
-        student.addThread(th2);
-        th2.addMessage(new Message(2, new Date(), user, "J'ai fait caca sur une des tables de l'U3-03 !", th2));
-        Thread th3 = new Thread(3, "title title title title title title title title title", user2, grp1);
-        grp1.addThread(th3);
-        th3.addMessage(new Message(3, new Date(), user2,
-                "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
-        new GraphicsClientInterface(user);
-        */
-    }
 }

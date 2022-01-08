@@ -1,5 +1,6 @@
 package client;
 
+import com.mysql.cj.log.Log;
 import object.*;
 import object.Thread;
 import server.ConnexionRefusedException;
@@ -14,13 +15,13 @@ import java.util.NavigableSet;
 import java.util.Scanner;
 
 public class Client implements ClientInterface{
-    private static User user = null;
+    private User user = null;
     private static final int clientPort = 5098;
     private static final int serverPort = 5099;
     private static final String serverIp = "192.168.68.102"; // A changer selon le serveur utilisé
     private static ServerInterface stubServer;
 
-    private static void connectingToServer(){
+    public void connectingToServer(){
         try {
             // Connexion au serveur
             Registry registry = LocateRegistry.getRegistry(serverIp, serverPort);
@@ -32,8 +33,6 @@ public class Client implements ClientInterface{
                     "\n\tPort d'entrée serveur : " + serverPort);
 
             // Connexion au compte de l'utilisateur
-            signIn();
-            stubServer.register(user.getId());
         }
         catch (Exception e){
             System.err.println("Client exception: " + e);
@@ -41,7 +40,7 @@ public class Client implements ClientInterface{
         }
     }
 
-    private static void bootingClientRegistry(){
+    public void bootingClientRegistry(){
         try{
             Registry registryClient = LocateRegistry.createRegistry(clientPort);
             ClientInterface stubClient = (ClientInterface) UnicastRemoteObject.exportObject(new Client(), clientPort);
@@ -54,7 +53,7 @@ public class Client implements ClientInterface{
         }
     }
 
-    private static void signIn(){
+    public void signIn(){
         Scanner console = new Scanner(System.in);
         String firstName =  console.nextLine();
         String lastName =  console.nextLine();
@@ -74,29 +73,20 @@ public class Client implements ClientInterface{
         }
     }
 
-    private static void logIn(){
-        //SignInInterface signInInterface = new SignInInterface();
-        Scanner console = new Scanner(System.in);
-        String username = console.nextLine();
-        String password = console.nextLine();
+    public void logIn(String username, String password) throws ConnexionRefusedException{
 
         try {
             user = stubServer.logIn(username, password);
             user.setStubServer(stubServer);
             System.err.println("Connexion au compte de l'utilisateur réussi");
         }
-        catch (ConnexionRefusedException connexionRefusedException){
-            System.err.println(connexionRefusedException + " : Username et/ou mot de passe incorrect(s)");
-        }
-        catch (Exception e){
-            System.err.println("Erreur lors de la tentative de connexion : " + e);
-            e.printStackTrace();
+        catch (RemoteException remoteException){
+            System.err.println("Erreur lors de la tentative de connexion : " + remoteException);
+            remoteException.printStackTrace();
         }
     }
 
-    private void logOut(){
-        //TODO fermer l'interface graphique du client
-
+    public void logOut(){
         try {
             stubServer.logOut(user);
         }
@@ -106,12 +96,9 @@ public class Client implements ClientInterface{
         }
 
         user = null;
-
-        //Ré ouverture de l'interface de connexion
-        logIn();
     }
 
-    private NavigableSet<Group> getAllGroup(){
+    public NavigableSet<Group> getAllGroup(){
         NavigableSet<Group> groupSet = null;
         try{
             groupSet = stubServer.getAllGroup();
@@ -124,7 +111,7 @@ public class Client implements ClientInterface{
         return groupSet;
     }
 
-    private NavigableSet<User> getAllUser(){
+    public NavigableSet<User> getAllUser(){
         NavigableSet<User> userSet = null;
         try{
             userSet = stubServer.getAllUser();
@@ -137,10 +124,15 @@ public class Client implements ClientInterface{
         return userSet;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    /*
     public static void main(String[] args) {
         bootingClientRegistry();
         connectingToServer();
-    }
+    }*/
 
 
     /* Méthodes utilisées uniquement par le serveur */

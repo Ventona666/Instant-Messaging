@@ -56,6 +56,10 @@ public abstract class User implements Serializable, Comparable<User> {
         this.groupSet = groupSet;
     }
 
+    public ServerInterface getStubServer() {
+        return stubServer;
+    }
+
     public void addGroup(Group groupToAdd){
         groupSet.add(groupToAdd);
     }

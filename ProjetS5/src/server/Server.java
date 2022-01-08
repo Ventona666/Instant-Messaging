@@ -228,7 +228,6 @@ public class Server implements ServerInterface {
 
     @Override
     public NavigableSet<User> getAllUser() throws RemoteException {
-        //return database.getAllUser();
-        return null;
+        return database.getAllUser();
     }
 }
