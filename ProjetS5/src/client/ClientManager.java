@@ -13,6 +13,7 @@ public class ClientManager {
         // Connexion au serveur
         client.bootingClientRegistry();
         client.connectingToServer();
+
         // Ouverture de l'interface graphique de connexion
         LogInGUI logInGUI = new LogInGUI(client);
         logInGUI.build();

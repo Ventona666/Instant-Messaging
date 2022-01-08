@@ -53,26 +53,6 @@ public class Client implements ClientInterface{
         }
     }
 
-    public void signIn(){
-        Scanner console = new Scanner(System.in);
-        String firstName =  console.nextLine();
-        String lastName =  console.nextLine();
-        String password1 =  console.nextLine();
-        String password2 =  console.nextLine();
-
-        try {
-            String username = stubServer.createAccount(firstName, lastName, password1, password2, false);
-            System.out.println(username);
-            System.err.println("Création du compte réussi");
-            user = stubServer.logIn(username, password1);
-            System.err.println("Connexion au compte de l'utilisateur réussi");
-        }
-        catch (Exception e){
-            System.err.println("Erreur lors de la création du nouveau compte :" + e);
-            e.printStackTrace();
-        }
-    }
-
     public void logIn(String username, String password) throws ConnexionRefusedException{
 
         try {

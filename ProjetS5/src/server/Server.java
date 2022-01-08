@@ -25,6 +25,7 @@ public class Server implements ServerInterface {
             registry.bind("ServerInterface", stub);
             System.err.println("Serveur lancé\n\tAdresse IP : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tPort : 5099\n");
+            //TODO appeler la fct pour l'affichage
         } catch (Exception e) {
             System.err.println("Erreur lancement serveur : " + e);
             e.printStackTrace();
@@ -152,8 +153,7 @@ public class Server implements ServerInterface {
         //TODO update bdd
     }
 
-    @Override
-    public String createAccount(String firstName, String lastName, String password1, String password2, boolean isStaff) throws RemoteException {
+    public String createAccount(String firstName, String lastName, String password, boolean isStaff) {
         //Generation du pseudo
         User user;
         if(isStaff){
@@ -163,22 +163,15 @@ public class Server implements ServerInterface {
             user = new CampusUser(firstName, lastName);
         }
 
-        if(password1.equals(password2)) {
-            try {
-                database.newUser(user, password1);
-            }
-            catch (NoSuchAlgorithmException noSuchAlgorithmException){
-                System.err.println("Erreur lors du hashage du mot de passe : " + noSuchAlgorithmException);
-                noSuchAlgorithmException.printStackTrace();
-            }
+        try {
+            database.newUser(user, password);
+        }
+        catch (NoSuchAlgorithmException noSuchAlgorithmException){
+            System.err.println("Erreur lors du hashage du mot de passe : " + noSuchAlgorithmException);
+            noSuchAlgorithmException.printStackTrace();
         }
 
         return user.getUsername();
-    }
-
-    @Override
-    public void deleteAccount(String userName, String password) throws RemoteException {
-        //TODO suppression dans la bdd
     }
 
     @Override
