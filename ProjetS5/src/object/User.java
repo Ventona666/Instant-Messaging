@@ -146,8 +146,8 @@ public abstract class User implements Serializable, Comparable<User> {
     }
 
     @Override
-    public int hashCode(){
-        return 31 * firstName.hashCode() * lastName.hashCode();
+    public int hashCode() {
+        return 31 * getFirstName().hashCode() * getLastName().hashCode() * ((Long) getId()).intValue();
     }
 
     @Override
