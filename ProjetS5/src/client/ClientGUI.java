@@ -230,10 +230,6 @@ public class ClientGUI {
         grp1.addThread(th3);
         th3.addMessage(new Message(3, new Date(), user2,
                 "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
-        new ClientGUI(user).build();
-        new UserInfoGUI(user2).build();
-        new newThreadGUI(user).build();
-        new ThreadMemberGUI(th2).build();
-        ;
+        new LogInGUI().build();
     }
 }
