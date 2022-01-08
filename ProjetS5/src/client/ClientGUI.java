@@ -3,6 +3,8 @@ package client;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -119,6 +121,13 @@ public class ClientGUI {
         JSeparator separator = new JSeparator();
         bottomRightPanel.add(separator, BorderLayout.NORTH);
 
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String message = textArea.getText();
+                client.getUser().sendMessage(message, currentThread);
+                textArea.setText(""); // Pour enlever le contenu du text area
+            }
+        });
     }
 
     private void buildTopPanel() {

@@ -81,8 +81,11 @@ public class NewThreadGUI {
         messageLabel = new JLabel("Message");
         threadField = new JTextField();
         threadField.setColumns(20);
-        // TODO : LISTE DES GROUPES DANS LA COMBO BOX
-        groupComboBox = new JComboBox<>();
+
+        Group[] listGroup = new Group[user.getGroupSet().size()];
+        listGroup = user.getGroupSet().toArray(listGroup);
+        groupComboBox = new JComboBox<>(listGroup);
+
         messageTextArea = new JTextArea();
         messageTextArea.setLineWrap(true);
         messagePane = new JScrollPane(messageTextArea);
@@ -99,8 +102,7 @@ public class NewThreadGUI {
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String title = threadField.getText();
-                //TODO récuperer le groupe avec la combobox
-                Group group = null;
+                Group group = (Group) groupComboBox.getSelectedItem();
                 String message = messageTextArea.getText();
                 Thread thread = client.getUser().newThread(title, group);
                 client.getUser().sendMessage(message, thread);
