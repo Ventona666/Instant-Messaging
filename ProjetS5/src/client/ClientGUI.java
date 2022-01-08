@@ -233,5 +233,7 @@ public class ClientGUI {
         new ClientGUI(user).build();
         new UserInfoGUI(user2).build();
         new newThreadGUI(user).build();
+        new ThreadMemberGUI(th2).build();
+        ;
     }
 }

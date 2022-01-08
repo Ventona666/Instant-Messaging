@@ -46,6 +46,13 @@ public class Thread implements Comparable<Thread> {
         return messageList;
     }
 
+    public NavigableSet<User> getParticipantsSet() {
+        NavigableSet<User> listUser = new TreeSet<>();
+        listUser.addAll(this.group.getUserSet());
+        listUser.add(this.owner);
+        return listUser;
+    }
+
     public void setMessageList(NavigableSet<Message> messageList) {
         this.messageList = messageList;
     }

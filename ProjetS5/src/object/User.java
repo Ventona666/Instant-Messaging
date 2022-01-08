@@ -125,7 +125,21 @@ public abstract class User implements Serializable, Comparable<User> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            User u = (User) obj;
+            return u.getId() == getId();
+        }
+        return false;
+    }
+
+    @Override
     public int hashCode() {
         return 31 * firstName.hashCode() * lastName.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return lastName + " " + firstName;
     }
 }
