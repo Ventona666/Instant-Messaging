@@ -100,7 +100,7 @@ public class LogInGUI {
         connectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
-                char[] password = pwdField.getPassword();
+                String password = pwdField.getPassword().toString();
                 // APPEL LOGIN
             }
         });
