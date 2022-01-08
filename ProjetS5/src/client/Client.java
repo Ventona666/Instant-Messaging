@@ -19,7 +19,6 @@ public class Client implements ClientInterface{
     private static final int serverPort = 5099;
     private static final String serverIp = "192.168.68.102"; // A changer selon le serveur utilisé
     private static ServerInterface stubServer;
-    private static ClientInterface stubClient;
 
     private static void connectingToServer(){
         try {
@@ -37,7 +36,7 @@ public class Client implements ClientInterface{
             stubServer.register(user.getId());
         }
         catch (Exception e){
-            System.err.println("Client exception: " + e.toString());
+            System.err.println("Client exception: " + e);
             e.printStackTrace();
         }
     }
@@ -45,12 +44,12 @@ public class Client implements ClientInterface{
     private static void bootingClientRegistry(){
         try{
             Registry registryClient = LocateRegistry.createRegistry(clientPort);
-            stubClient = (ClientInterface) UnicastRemoteObject.exportObject(new Client(), clientPort);
+            ClientInterface stubClient = (ClientInterface) UnicastRemoteObject.exportObject(new Client(), clientPort);
             registryClient.bind("ClientInterface", stubClient);
             System.err.println("Interface client activée");
         }
         catch (Exception e){
-            System.err.println("Client exception: " + e.toString());
+            System.err.println("Client exception: " + e);
             e.printStackTrace();
         }
     }
@@ -83,6 +82,7 @@ public class Client implements ClientInterface{
 
         try {
             user = stubServer.logIn(username, password);
+            user.setStubServer(stubServer);
             System.err.println("Connexion au compte de l'utilisateur réussi");
         }
         catch (ConnexionRefusedException connexionRefusedException){
@@ -141,6 +141,10 @@ public class Client implements ClientInterface{
         bootingClientRegistry();
         connectingToServer();
     }
+
+
+    /* Méthodes utilisées uniquement par le serveur */
+
 
     @Override
     public void ping() throws RemoteException {

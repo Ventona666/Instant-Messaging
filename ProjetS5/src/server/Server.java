@@ -197,6 +197,11 @@ public class Server implements ServerInterface {
     }
 
     @Override
+    public void createGroup(Group group) throws RemoteException {
+        database.newGroup(group);
+    }
+
+    @Override
     public void addToGroup(User user, Group group) throws RemoteException {
         group.addUser(user);
         database.newMember(user, group);

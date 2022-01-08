@@ -4,18 +4,24 @@ import utils.IdGenerator;
 import utils.UsernameGenerator;
 
 public class StaffUser extends User {
-    public String genUsername(String firstName, String lastName){
-        char[] threeChars = new char[3];
-        lastName.getChars(0,3, threeChars, 0);
-        return firstName.toLowerCase() + threeChars.toString().toUpperCase();
-    }
-
     public StaffUser(long id, String firstName, String lastName, String username) {
         super(id, firstName, lastName, username);
     }
 
     public StaffUser(String firstName, String lastName){
         super(IdGenerator.idGenerator(firstName, lastName), firstName, lastName, UsernameGenerator.usernameGenerator(firstName, lastName));
+    }
+
+    public Group createGroup(String name){
+        Group group = new Group(name);
+        try{
+            stubServer.createGroup(group);
+            System.err.println("Le groupe a été créé avec succès");
+        } catch (Exception e){
+            System.err.println("Le groupe n'a pas pu être créé : " + e);
+            e.printStackTrace();
+        }
+        return group;
     }
 
     public void addToGroup(User user, Group group) {

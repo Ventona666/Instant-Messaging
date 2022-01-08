@@ -6,7 +6,6 @@ import object.Thread;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.NavigableSet;
 
 public interface ClientInterface extends Remote {
     void ping() throws RemoteException;

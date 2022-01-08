@@ -7,7 +7,7 @@ import java.util.TreeSet;
 
 public class Group implements Comparable<Group> {
     private final long id;
-    private String name;
+    private final String name;
     private final NavigableSet<User> userSet = new TreeSet<>();
     private final NavigableSet<Thread> threadSet = new TreeSet<>();
     private int numberOfMember = 0;
@@ -33,10 +33,6 @@ public class Group implements Comparable<Group> {
 
     public int getNumberOfMember() {
         return numberOfMember;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public NavigableSet<User> getUserSet() {

@@ -58,8 +58,8 @@ public class Thread implements Comparable<Thread> {
         return isClose;
     }
 
-    public boolean closeThread(){
-        return isClose = true;
+    public void closeThread(){
+        isClose = true;
     }
 
     @Override
