@@ -8,22 +8,22 @@ public class Thread implements Comparable<Thread> {
     private final long id;
     private final String title;
     private final User owner;
-    private final Group group;
+    private final long idGroup;
     private boolean isClose = false;
     private NavigableSet<Message> messageList = new TreeSet<>();
 
-    public Thread(String title, User owner, Group group) {
+    public Thread(String title, User owner, long group) {
         this.id = idGenerator(title);
         this.title = title;
         this.owner = owner;
-        this.group = group;
+        this.idGroup = group;
     }
 
-    public Thread(long id, String title, User owner, Group group) {
+    public Thread(long id, String title, User owner, long group) {
         this.id = id;
         this.title = title;
         this.owner = owner;
-        this.group = group;
+        this.idGroup = group;
     }
 
     public long getId() {
@@ -38,19 +38,12 @@ public class Thread implements Comparable<Thread> {
         return owner;
     }
 
-    public Group getGroup() {
-        return group;
+    public long getIdGroup() {
+        return idGroup;
     }
 
     public NavigableSet<Message> getMessageList() {
         return messageList;
-    }
-
-    public NavigableSet<User> getParticipantsSet() {
-        NavigableSet<User> listUser = new TreeSet<>();
-        listUser.addAll(this.group.getUserSet());
-        listUser.add(owner);
-        return listUser;
     }
 
     public void setMessageList(NavigableSet<Message> messageList) {
@@ -65,8 +58,8 @@ public class Thread implements Comparable<Thread> {
         return isClose;
     }
 
-    public boolean closeThread() {
-        return isClose = true;
+    public void closeThread() {
+        isClose = true;
     }
 
     @Override

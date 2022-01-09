@@ -1,16 +1,20 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,24 +24,23 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import object.Group;
 import object.Message;
+import object.MessageStatus;
 import object.Thread;
-import object.User;
-import object.CampusUser;
 
 public class ClientGUI {
 
-    private User user;
+    private Client client;
     private Thread currentThread = null;
 
     // Components
@@ -53,11 +56,14 @@ public class ClientGUI {
     private JScrollPane scrollPane;
     private DefaultTableModel messageModel;
     private JTable messageTable;
+    JPanel imgUserInfo;
+    JPanel imgNewThread;
+    JPanel imgLogOut;
 
     // private Color blue = new Color(16, 79, 85, 255);
 
-    public ClientGUI(User user) {
-        this.user = user;
+    public ClientGUI(Client client) {
+        this.client = client;
     }
 
     private void buildComponents() {
@@ -65,6 +71,7 @@ public class ClientGUI {
         buildTree();
         buildScrollPane();
         buildLeftPanel();
+        buildIcons();
         buildBottomRightPanel();
         buildMessageTable();
         buildRightPanel();
@@ -120,22 +127,28 @@ public class ClientGUI {
         bottomRightPanel.add(btnNewButton, BorderLayout.EAST);
         JSeparator separator = new JSeparator();
         bottomRightPanel.add(separator, BorderLayout.NORTH);
-
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String message = textArea.getText();
+                client.getUser().sendMessage(message, currentThread);
+                textArea.setText("");
+            }
+        });
     }
 
     private void buildTopPanel() {
         topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        JLabel firstName = new JLabel(user.getFirstName());
+        JLabel firstName = new JLabel(client.getUser().getFirstName());
         topPanel.add(firstName);
-        JLabel lastName = new JLabel(user.getLastName());
+        JLabel lastName = new JLabel(client.getUser().getLastName());
         topPanel.add(lastName);
-        JPanel imgUserInfo = new JPanel();
+        imgUserInfo = new JPanel();
         topPanel.add(imgUserInfo);
-        JPanel imgNewThread = new JPanel();
+        imgNewThread = new JPanel();
         topPanel.add(imgNewThread);
-        JPanel imgSignOut = new JPanel();
-        topPanel.add(imgSignOut);
+        imgLogOut = new JPanel();
+        topPanel.add(imgLogOut);
     }
 
     private void buildScrollPane() {
@@ -144,7 +157,7 @@ public class ClientGUI {
 
     private void buildTree() {
         DefaultMutableTreeNode groups = new DefaultMutableTreeNode("Groupes");
-        TreeMap<Group, TreeSet<Thread>> threadList = user.getAllThread();
+        TreeMap<Group, TreeSet<Thread>> threadList = client.getUser().getAllThread();
         for (Group group : threadList.keySet()) {
             DefaultMutableTreeNode groupTemp = new DefaultMutableTreeNode(group.getName());
             if (!threadList.get(group).isEmpty())
@@ -167,17 +180,80 @@ public class ClientGUI {
         });
     }
 
+    private void buildIcons() {
+        ImageIcon addIcon;
+        JLabel iconLabel;
+        addIcon = new ImageIcon(ClassLoader.getSystemResource("client/plus.png"));
+        iconLabel = new JLabel(addIcon);
+        iconLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new NewThreadGUI(client.getUser()).build();
+            }
+
+        });
+        imgNewThread.add(iconLabel);
+        addIcon = new ImageIcon(ClassLoader.getSystemResource("client/user.png"));
+        iconLabel = new JLabel(addIcon);
+        iconLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new UserInfoGUI(client.getUser()).build();
+            }
+
+        });
+        imgUserInfo.add(iconLabel);
+        addIcon = new ImageIcon(ClassLoader.getSystemResource("client/logout.png"));
+        iconLabel = new JLabel(addIcon);
+        iconLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                client.logOut();
+            }
+
+        });
+        imgLogOut.add(iconLabel);
+    }
+
     private void buildMessageTable() {
         String[] columns = { "", "" };
         messageModel = new DefaultTableModel(columns, 0);
         messageTable = new JTable(messageModel);
+        messageTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int colSelec = messageTable.getSelectedColumn();
+                int rowSelec = messageTable.getSelectedRow();
+                Message currentMessage = (Message) messageTable.getModel().getValueAt(rowSelec, colSelec);
+                MessageStatus status = currentMessage.getMessageStatus();
+                Color cellColor = Color.WHITE;
+                if (status.equals(MessageStatus.READ_BY_ALL_USERS))
+                    cellColor = Color.GREEN;
+                if (status.equals(MessageStatus.RECEIVED_BY_ALL_USERS))
+                    cellColor = Color.ORANGE;
+                if (status.equals(MessageStatus.RECEIVED_BY_SERVER))
+                    cellColor = Color.RED;
+                messageTable.setSelectionBackground(cellColor);
+            }
+        });
+    }
+
+    private void setPositionMessage(Message currentMessage) {
+        Message messageRight = null;
+        Message messageLeft = null;
+        currentMessage.setNameSender(client.getUser().toString());
+        if (currentMessage.getId() == client.getUser().getId())
+            messageLeft = currentMessage;
+        else
+            messageRight = currentMessage;
+        messageModel.addRow(new Object[] { messageLeft, messageRight });
     }
 
     private void updateMessageTable() {
         List<Message> messageList = new ArrayList<>(currentThread.getMessageList());
         for (Iterator<Message> it = messageList.listIterator(messageModel.getRowCount()); it.hasNext();) {
             Message currentMessage = it.next();
-            messageModel.addRow(new Object[] { null, currentMessage });
+            setPositionMessage(currentMessage);
         }
     }
 
@@ -186,16 +262,14 @@ public class ClientGUI {
             messageModel.removeRow(i);
         }
         for (Message currentMessage : currentThread.getMessageList()) {
-            messageModel.addRow(new Object[] { null, currentMessage });
+            setPositionMessage(currentMessage);
         }
     }
 
-    private void buildMessageStyle() {
-
-    }
-
     private void updateTree() {
-        // CHANGER L'ARBRE SI NOUVEAU MESSAGE OU NOUVEAU THREAD
+        // TODO: METTRE A JOUR LES THREADS SI NOUVEAU MESSAGE A VOIR SI FONCTION FAITE
+        // DANS CLIENT
+        updateMessageTable();
     }
 
     public void build() {
@@ -203,35 +277,4 @@ public class ClientGUI {
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        CampusUser user = new CampusUser(1, "Sabrina", "Sikder", "sabrinaSI");
-        CampusUser user2 = new CampusUser(2, "Hugo", "Deleye", "hugoDE");
-        Group student = new Group(0, "Étudiant");
-        Group grp1 = new Group(1, "TDA1");
-        Group grp2 = new Group(2, "TDA2");
-        Group grp3 = new Group(3, "TDA3");
-        Group grp4 = new Group(4, "TDA4");
-        Group grp5 = new Group(5, "TDA5");
-        user.addGroup(grp1);
-        grp1.addUser(user);
-        user.addGroup(student);
-        student.addUser(user);
-        user2.addGroup(grp2);
-        grp2.addUser(user2);
-        user2.addGroup(student);
-        student.addUser(user2);
-        Thread th1 = new Thread(1, "J'ai des soucis avec Christine Sénac", user, grp4);
-        grp4.addThread(th1);
-        user.addThread(th1);
-        th1.addMessage(new Message(1, new Date(), user, "Christine arrête pas de m'embeter", th1));
-        Thread th2 = new Thread(2, "caca", user, student);
-        student.addThread(th2);
-        th2.addMessage(new Message(2, new Date(), user, "J'ai fait caca sur une des tables de l'U3-03 !", th2));
-        Thread th3 = new Thread(3, "title title title title title title title title title", user2, grp1);
-        grp1.addThread(th3);
-        th3.addMessage(new Message(3, new Date(), user2,
-                "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
-        new LogInGUI().build();
-
-    }
 }

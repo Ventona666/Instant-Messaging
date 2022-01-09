@@ -1,5 +1,8 @@
 package client;
 
+import object.User;
+import server.ConnexionRefusedException;
+
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.GridBagConstraints;
@@ -16,7 +19,7 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 public class LogInGUI {
-
+    private Client client;
     // Components
 
     JFrame frame;
@@ -26,6 +29,10 @@ public class LogInGUI {
     JLabel pwdLabel;
     JPasswordField pwdField;
     JButton connectButton;
+
+    public LogInGUI(Client client) {
+        this.client = client;
+    }
 
     private void buildComponents() {
         buildButton();
@@ -91,6 +98,18 @@ public class LogInGUI {
         mainPane.add(pwdField, gbcPasswordField);
     }
 
+    private void register() {
+        User user = client.getUser();
+        // Enregistrement comme client activement connecté auprès du serveur
+        try {
+            user.getStubServer().register(user.getId());
+            System.err.println("Enregistrement auprès du serveur réussi");
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'enregistrement auprès du serveur : " + e);
+            e.printStackTrace();
+        }
+    }
+
     private void buildButton() {
         connectButton = new JButton("Se connecter");
         GridBagConstraints gbcConnectButton = new GridBagConstraints();
@@ -100,8 +119,18 @@ public class LogInGUI {
         connectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
-                String password = pwdField.getPassword().toString();
-                // APPEL LOGIN
+                String password = String.valueOf(pwdField.getPassword());
+                try {
+                    client.logIn(username, password);
+                    register();
+                    frame.dispose();
+                    ClientGUI clientGUI = new ClientGUI(client);
+                    clientGUI.build();
+                } catch (ConnexionRefusedException connexionRefusedException) {
+                    // TODO afficher un message graphique
+                    System.err.println("Username et/ou mot de passe incorrect : " + connexionRefusedException);
+                    connexionRefusedException.printStackTrace();
+                }
             }
         });
         mainPane.add(connectButton, gbcConnectButton);

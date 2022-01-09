@@ -8,31 +8,32 @@ import java.util.Date;
 public class Message implements Serializable, Comparable<Message> {
     private final long id;
     private final Date date;
-    private final User sender;
+    private final long idSender;
     private final String text;
-    private final Thread thread;
+    private final long idThread;
     private int numberOfReceptions = 0;
     private int numberOfReads = 0;
+    private String nameSender;
     private MessageStatus messageStatus = MessageStatus.DEFAULT;
 
-    public Message(Date date, User sender, String text, Thread thread) {
+    public Message(Date date, long idSender, String text, long thread) {
         this.id = IdGenerator.idGenerator(text);
         this.date = date;
-        this.sender = sender;
+        this.idSender = idSender;
         this.text = text;
-        this.thread = thread;
+        this.idThread = thread;
     }
 
-    public Message(long id, Date date, User sender, String text, Thread thread) {
+    public Message(long id, Date date, long idSender, String text, long thread) {
         this.id = id;
         this.date = date;
-        this.sender = sender;
+        this.idSender = idSender;
         this.text = text;
-        this.thread = thread;
+        this.idThread = thread;
     }
 
-    public Thread getThread() {
-        return thread;
+    public long getIdThread() {
+        return idThread;
     }
 
     public long getId() {
@@ -47,13 +48,17 @@ public class Message implements Serializable, Comparable<Message> {
         return text;
     }
 
-    public User getSender() {
-        return sender;
+    public long getIdSender() {
+        return idSender;
+    }
+
+    public void setNameSender(String nameSender) {
+        this.nameSender = nameSender;
     }
 
     @Override
     public String toString() {
-        return text;
+        return nameSender + "\n\n" + text + "\n\n" + date;
     }
 
     public MessageStatus getMessageStatus() {
@@ -64,16 +69,16 @@ public class Message implements Serializable, Comparable<Message> {
         this.messageStatus = messageStatus;
     }
 
-    public void incrementNumberOfReceptions() {
+    public void incrementNumberOfReceptions(int numberOfMember) {
         numberOfReceptions++;
-        if (numberOfReceptions == this.thread.getGroup().getUserSet().size() + 1) {
+        if (numberOfReceptions >= numberOfMember) {
             this.messageStatus = MessageStatus.RECEIVED_BY_ALL_USERS;
         }
     }
 
-    public void incrementNumberOfReads() {
+    public void incrementNumberOfReads(int numberOfMember) {
         numberOfReads++;
-        if (numberOfReads == this.thread.getGroup().getUserSet().size() + 1) {
+        if (numberOfReads >= numberOfMember) {
             this.messageStatus = MessageStatus.READ_BY_ALL_USERS;
         }
     }
@@ -102,4 +107,5 @@ public class Message implements Serializable, Comparable<Message> {
             return 1;
         }
     }
+
 }

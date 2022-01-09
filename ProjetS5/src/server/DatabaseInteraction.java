@@ -8,11 +8,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.*;
 
+import com.sun.source.tree.Tree;
 import object.CampusUser;
 import object.Group;
 import object.Message;
@@ -39,7 +37,7 @@ public class DatabaseInteraction {
     public void initialisation() {
         List<String> tablesCreateList = new ArrayList<String>();
         tablesCreateList.add(
-                "CREATE TABLE IF NOT EXISTS GroupT (idGroup BIGINT, nameGroup VARCHAR(255), PRIMARY KEY (idGroup));");
+                "CREATE TABLE IF NOT EXISTS GroupT (idGroup BIGINT, nameGroup VARCHAR(255), numberOfMember BIGINT, PRIMARY KEY (idGroup));");
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS UserT (idUser BIGINT, passwordUser VARCHAR(255), firstNameUser VARCHAR(255), lastNameUser VARCHAR(255), username VARCHAR(255), typeUser VARCHAR(20), PRIMARY KEY (idUser));");
         tablesCreateList.add(
@@ -52,6 +50,7 @@ public class DatabaseInteraction {
                 "CREATE TABLE IF NOT EXISTS ReadT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
         tablesCreateList.add(
                 "CREATE TABLE IF NOT EXISTS ReceiveT (idUser BIGINT, idThread BIGINT, idMessage BIGINT, PRIMARY KEY (idUser, idThread), FOREIGN KEY (idUser) REFERENCES UserT (idUser) ON DELETE CASCADE, FOREIGN KEY (idThread) REFERENCES ThreadT (idThread) ON DELETE CASCADE);");
+
         for (String sql : tablesCreateList) {
             try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                     Statement stmt = con.createStatement();) {
@@ -66,10 +65,12 @@ public class DatabaseInteraction {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
         String passwordEnter = new String(hash, StandardCharsets.UTF_8);
-        String req = "SELECT idUser, passwordUser FROM UserT WHERE username=" + username;
+        String req = "SELECT passwordUser, idUser FROM UserT WHERE username=" + "\"" + username + "\"";
+        System.out.println(req);
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             if (passwordEnter.equals(rs.getString("passwordUser")))
                 return getUser(rs.getLong("idUser"));
             else
@@ -85,9 +86,10 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
-            Group group = getGroup(rs.getLong("idGroup"));
+            rs.next();
+            long idGroup = rs.getLong("idGroup");
             User user = getUser(rs.getLong("idUser"));
-            return new Thread(idThread, rs.getString("titleThread"), user, group);
+            return new Thread(idThread, rs.getString("titleThread"), user, idGroup);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -96,7 +98,7 @@ public class DatabaseInteraction {
 
     public void newThread(Thread thread) {
         String req = "INSERT INTO ThreadT VALUES (" + thread.getId() + ", '" + thread.getTitle() + "', "
-                + thread.getOwner().getId() + ", " + thread.getGroup().getId() + ")";
+                + thread.getOwner().getId() + ", " + thread.getIdGroup() + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(req);
@@ -110,10 +112,11 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
-            User sender = getUser(rs.getLong("idSender"));
-            Thread thread = getThread(rs.getLong("idThread"));
-            Message message = new Message(idMessage, rs.getDate("dateMessage"), sender, rs.getString("textMessage"),
-                    thread);
+            rs.next();
+            long idSender = rs.getLong("idSender");
+            long idThread = rs.getLong("idThread");
+            Message message = new Message(idMessage, rs.getDate("dateMessage"), idSender, rs.getString("textMessage"),
+                    idThread);
             message.setMessageStatus(MessageStatus.values()[rs.getInt("statusMessage")]);
             message.setNumberOfReceptions(rs.getInt("nbReMessage"));
             message.setNumberOfReads(rs.getInt("nbRdMessage"));
@@ -126,9 +129,9 @@ public class DatabaseInteraction {
 
     public void newMessage(Message message) {
         String sql = "INSERT INTO MessageT VALUES (" + message.getId() + ", '" + message.getDate() + "', "
-                + message.getSender().getId() + ", '" + message.getText() + "', " + message.getNumberOfReads()
+                + message.getIdSender() + ", '" + message.getText() + "', " + message.getNumberOfReads()
                 + ", " + message.getNumberOfReceptions() + ", " + message.getMessageStatus().ordinal()
-                + ", " + message.getThread().getId() + ")";
+                + ", " + message.getIdThread() + ")";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
@@ -155,6 +158,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             return getMessage(rs.getLong("idMessage"));
         } catch (SQLException e) {
             e.printStackTrace();
@@ -162,9 +166,10 @@ public class DatabaseInteraction {
         }
     }
 
-    public void updateRead(User user, Thread thread, Message message) {
-        String sql = "UPDATE ReadT WHERE idUser=" + user.getId() + " AND idThread=" + thread.getId() + " SET idMessage="
-                + message.getId();
+    public void updateRead(long idUser, long idMessage) {
+        long idThread = getMessage(idMessage).getIdThread();
+        String sql = "UPDATE ReadT WHERE idUser=" + idUser + " AND idThread=" + idThread + " SET idMessage="
+                + idMessage;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
@@ -223,6 +228,7 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             String firstName = rs.getString("firstNameUser");
             String lastName = rs.getString("lastNameUser");
             String username = rs.getString("username");
@@ -231,6 +237,7 @@ public class DatabaseInteraction {
             else
                 user = new StaffUser(idUser, firstName, lastName, username);
             user.setGroupSet(getGroupUser(idUser));
+            user.setGroupThreadSetMap(getThreadOwner(idUser));
             return user;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -238,7 +245,11 @@ public class DatabaseInteraction {
         }
     }
 
-    public void newUser(User user, String password) {
+    public void newUser(User user, String password) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+        password = new String(hash, StandardCharsets.UTF_8);
+
         String typeUser = user instanceof CampusUser ? "campus" : "staff";
         String req = "INSERT INTO UserT VALUES (" + user.getId() + ", '" + password + "', '" + user.getFirstName()
                 + "', '"
@@ -257,6 +268,16 @@ public class DatabaseInteraction {
 
     public void newMember(User user, Group group) {
         String req = "INSERT INTO MemberT VALUES (" + user.getId() + ", " + group.getId() + ")";
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();) {
+            stmt.executeUpdate(req);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void newGroup(Group group) {
+        String req = "INSERT INTO GroupT VALUES (" + group.getId() + ", '" + group.getName() + "')";
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();) {
             stmt.executeUpdate(req);
@@ -316,8 +337,10 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
                 Statement stmt = con.createStatement();
                 ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
             String name = rs.getString("nameGroup");
-            Group group = new Group(idGroup, name);
+            int numberOfMember = rs.getInt("numberOfMember");
+            Group group = new Group(idGroup, name, numberOfMember);
             for (User u : getUserGroup(idGroup))
                 group.addUser(u);
             for (Thread t : getThreadGroup(idGroup))
@@ -326,16 +349,6 @@ public class DatabaseInteraction {
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public void newGroup(Group group) {
-        String req = "INSERT INTO GroupT VALUES (" + group.getId() + ", '" + group.getName() + "')";
-        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
-                Statement stmt = con.createStatement();) {
-            stmt.executeUpdate(req);
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -353,6 +366,19 @@ public class DatabaseInteraction {
         return listUser;
     }
 
+    private int getNumberOfMember(long idGroup) {
+        String req = "SELECT numberOfMember FROM GroupT WHERE idGroup=" + idGroup;
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(req);) {
+            rs.next();
+            return rs.getInt("numberOfMember");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     private NavigableSet<Thread> getThreadGroup(long idGroup) {
         String req = "SELECT idThread FROM ThreadT WHERE idGroup=" + idGroup;
         NavigableSet<Thread> listThread = new TreeSet<>();
@@ -365,6 +391,31 @@ public class DatabaseInteraction {
             e.printStackTrace();
         }
         return listThread;
+    }
+
+    private TreeMap<Group, TreeSet<Thread>> getThreadOwner(long idUser) {
+        // Permet de récuperer tout les threads créé par un user
+        String req = "SELECT idThread FROM ThreadT WHERE idUser=" + idUser;
+        TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = new TreeMap<>();
+        TreeSet<Thread> threadTreeSet;
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(req);) {
+            while (rs.next()) {
+                Thread thread = getThread(rs.getLong("idGroup"));
+                Group group = getGroup(thread.getIdGroup());
+                if (!groupTreeSetTreeMap.containsKey(group)) {
+                    threadTreeSet = new TreeSet<>();
+                } else {
+                    threadTreeSet = groupTreeSetTreeMap.get(group);
+                }
+                threadTreeSet.add(thread);
+                groupTreeSetTreeMap.put(group, threadTreeSet);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return groupTreeSetTreeMap;
     }
 
     public boolean uniqueIdUser(long idUser) {

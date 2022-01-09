@@ -15,7 +15,7 @@ public abstract class User implements Serializable, Comparable<User> {
     private final String username;
     protected ServerInterface stubServer;
     private NavigableSet<Group> groupSet = new TreeSet<>();
-    private NavigableSet<Thread> threadCreated = new TreeSet<>();
+    private TreeMap<Group, TreeSet<Thread>> groupThreadSetMap = new TreeMap<>();
 
     public User(long id, String firstName, String lastName, String username) {
         this.id = id;
@@ -44,6 +44,10 @@ public abstract class User implements Serializable, Comparable<User> {
         this.stubServer = stubServer;
     }
 
+    public void setGroupThreadSetMap(TreeMap<Group, TreeSet<Thread>> groupThreadSetMap) {
+        this.groupThreadSetMap = groupThreadSetMap;
+    }
+
     public NavigableSet<Group> getGroupSet() {
         return groupSet;
     }
@@ -52,40 +56,30 @@ public abstract class User implements Serializable, Comparable<User> {
         this.groupSet = groupSet;
     }
 
-    public boolean addGroup(Group groupToAdd) {
-        return groupSet.add(groupToAdd);
+    public ServerInterface getStubServer() {
+        return stubServer;
     }
 
-    public void addThread(Thread thread) {
-        threadCreated.add(thread);
+    public void addGroup(Group groupToAdd) {
+        groupSet.add(groupToAdd);
     }
 
     public TreeMap<Group, TreeSet<Thread>> getAllThread() {
-        TreeMap<Group, TreeSet<Thread>> threadList = new TreeMap<>();
-        TreeSet<Thread> tempList;
+        TreeMap<Group, TreeSet<Thread>> groupThreadTreeMap = new TreeMap<>();
+        TreeSet<Thread> threadTreeSet = new TreeSet<>();
+        ;
         for (Group g : groupSet) {
-            if (!threadList.containsKey(g)) {
-                tempList = new TreeSet<>();
-                threadList.put(g, tempList);
-            } else
-                tempList = threadList.get(g);
-            tempList.addAll(g.getThreadSet());
+            threadTreeSet.addAll(g.getThreadSet());
+            groupThreadTreeMap.put(g, threadTreeSet);
+            threadTreeSet = new TreeSet<>();
         }
-        for (Thread t : threadCreated) {
-            if (threadList.containsKey(t.getGroup()))
-                tempList = threadList.get(t.getGroup());
-            else {
-                tempList = new TreeSet<>();
-                threadList.put(t.getGroup(), tempList);
-            }
-            tempList.add(t);
-        }
-        return threadList;
+        groupThreadTreeMap.putAll(groupThreadSetMap);
+        return groupThreadTreeMap;
     }
 
     public void sendMessage(String text, Thread thread) {
         try {
-            Message message = new Message(new Date(), this, text, thread);
+            Message message = new Message(new Date(), this.id, text, thread.getId());
             stubServer.sendMessage(message);
             System.err.println("Message envoyé au serveur avec succès");
         } catch (Exception e) {
@@ -94,15 +88,24 @@ public abstract class User implements Serializable, Comparable<User> {
         }
     }
 
-    public void newThread(String title, Group group) {
+    public Thread newThread(String title, Group group) {
         try {
-            Thread thread = new Thread(title, this, group);
+            Thread thread = new Thread(title, this, group.getId());
             stubServer.newThread(thread);
+
+            if (!group.getUserSet().contains(this)) {
+                TreeSet<Thread> threadTreeSet = groupThreadSetMap.get(group);
+                threadTreeSet.add(thread);
+                groupThreadSetMap.put(group, threadTreeSet);
+            }
+
             System.err.println("Démarrage d'un nouveau thread réussi");
+            return thread;
         } catch (Exception e) {
             System.err.println("Erreur lors de la création thread : " + e);
             e.printStackTrace();
         }
+        return null;
     }
 
     public void closeThread(int idThread) {

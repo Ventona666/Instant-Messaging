@@ -7,13 +7,15 @@ import java.util.TreeSet;
 
 public class Group implements Comparable<Group> {
     private final long id;
-    private String name;
-    private NavigableSet<User> userSet = new TreeSet<>();
-    private NavigableSet<Thread> threadSet = new TreeSet<>();
+    private final String name;
+    private final NavigableSet<User> userSet = new TreeSet<>();
+    private final NavigableSet<Thread> threadSet = new TreeSet<>();
+    private int numberOfMember = 0;
 
-    public Group(long id, String name) {
+    public Group(long id, String name, int numberOfMember) {
         this.id = id;
         this.name = name;
+        this.numberOfMember = numberOfMember;
     }
 
     public Group(String name) {
@@ -29,20 +31,24 @@ public class Group implements Comparable<Group> {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public int getNumberOfMember() {
+        return numberOfMember;
     }
 
     public NavigableSet<User> getUserSet() {
         return userSet;
     }
 
-    public boolean addUser(User userToAdd) {
-        return userSet.add(userToAdd);
+    public void addUser(User userToAdd) {
+        if (userSet.add(userToAdd)) {
+            numberOfMember++;
+        }
     }
 
-    public boolean removeUser(User userToDelete) {
-        return userSet.remove(userToDelete);
+    public void removeUser(User userToDelete) {
+        if (userSet.remove(userToDelete)) {
+            numberOfMember--;
+        }
     }
 
     public NavigableSet<Thread> getThreadSet() {
@@ -65,9 +71,5 @@ public class Group implements Comparable<Group> {
     @Override
     public int compareTo(Group group) {
         return name.compareTo(group.getName());
-    }
-
-    public String toString() {
-        return name;
     }
 }

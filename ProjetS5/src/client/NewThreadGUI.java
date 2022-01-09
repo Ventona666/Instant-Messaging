@@ -75,8 +75,10 @@ public class NewThreadGUI {
         messageLabel = new JLabel("Message");
         threadField = new JTextField();
         threadField.setColumns(20);
-        // TODO : LISTE DES GROUPES DANS LA COMBO BOX
-        groupComboBox = new JComboBox<>();
+        Group[] listGroup = new Group[user.getGroupSet().size()];
+        listGroup = user.getGroupSet().toArray(listGroup);
+        groupComboBox = new JComboBox<>(listGroup);
+        groupComboBox.getSelectedItem();
         messageTextArea = new JTextArea();
         messageTextArea.setLineWrap(true);
         messagePane = new JScrollPane(messageTextArea);
