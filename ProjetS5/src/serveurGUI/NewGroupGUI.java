@@ -1,5 +1,6 @@
 package serveurGUI;
 
+import object.User;
 import server.Server;
 
 import java.awt.BorderLayout;
@@ -20,11 +21,14 @@ import javax.swing.border.EmptyBorder;
 
 public class NewGroupGUI {
     private Server server;
+    private NewGroupGUI newGroupGUISelf = this;
 
     // Components
     private JFrame frame;
     private JPanel mainPanel;
     private JPanel centerPanel;
+    private JLabel userSelectedLabel;
+    private User[] listSelectedUser;
 
     public NewGroupGUI(Server server) {
         this.server = server;
@@ -45,6 +49,16 @@ public class NewGroupGUI {
         frame.setContentPane(mainPanel);
     }
 
+    public void setListSelectedUser(User[] listSelectedUser) {
+        this.listSelectedUser = listSelectedUser;
+        StringBuilder selectedUser = new StringBuilder();
+        for(User user : listSelectedUser){
+            selectedUser.append(user.toString());
+            selectedUser.append('\n');
+        }
+        userSelectedLabel.setText(selectedUser.toString());
+    }
+
     private void buildCenterPanel() {
         centerPanel = new JPanel();
 
@@ -58,7 +72,14 @@ public class NewGroupGUI {
 
         JButton choisirUserButton = new JButton("Choisir les utilisateurs");
 
-        JLabel userSelectedLabel = new JLabel("Utilisateurs s\u00E9lectionn\u00E9s");
+        choisirUserButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                AddUsersToGroup addUsersToGroup = new AddUsersToGroup(server, newGroupGUISelf);
+                addUsersToGroup.buildFrame();
+            }
+        });
+
+        userSelectedLabel = new JLabel("Utilisateurs s\u00E9lectionn\u00E9s");
 
         JButton validerButton = new JButton("Valider");
 
@@ -118,8 +139,6 @@ public class NewGroupGUI {
         JLabel titleLabel = new JLabel("Créer un nouveau groupe");
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(titleLabel, BorderLayout.NORTH);
-
-
     }
 }
 

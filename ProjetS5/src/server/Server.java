@@ -3,6 +3,7 @@ package server;
 import object.*;
 import client.ClientInterface;
 import object.Thread;
+import serveurGUI.AddUsersToGroup;
 import serveurGUI.NewGroupGUI;
 
 import java.net.Inet4Address;
@@ -26,6 +27,8 @@ public class Server implements ServerInterface {
             registry.bind("ServerInterface", stub);
             System.err.println("Serveur lancé\n\tAdresse IP : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tPort : 5099\n");
+            //NewGroupGUI newGroupGUI = new NewGroupGUI(this);
+            //newGroupGUI.build();
             NewGroupGUI newGroupGUI = new NewGroupGUI(this);
             newGroupGUI.build();
             //TODO appeler la fct pour l'affichage
