@@ -116,7 +116,7 @@ public class DatabaseInteraction {
             rs.next();
             long idSender = rs.getLong("idSender");
             long idThread = rs.getLong("idThread");
-            Message message = new Message(idMessage, rs.getTimestamp("dateMessage"), idSender, rs.getString("textMessage"), idThread);
+            Message message = new Message(idMessage, new Date(rs.getTimestamp("dateMessage").getTime()), idSender, rs.getString("textMessage"), idThread);
             message.setMessageStatus(MessageStatus.values()[rs.getInt("statusMessage")]);
             message.setNumberOfReceptions(rs.getInt("nbReMessage"));
             message.setNumberOfReads(rs.getInt("nbRdMessage"));
@@ -128,10 +128,13 @@ public class DatabaseInteraction {
     }
 
     public void newMessage(Message message) {
-        String sql = "INSERT INTO MessageT VALUES (" + message.getId() + ", '" + new Timestamp(message.getDate().getTime()) + "', "
-                + message.getIdSender() + ", '" + message.getText() + "', " + message.getNumberOfReads()
-                + ", " + message.getNumberOfReceptions() + ", " + message.getMessageStatus().ordinal()
+        String sql = "INSERT INTO MessageT VALUES (" + message.getId() + ", '" +
+                new Timestamp(message.getDate().getTime()) + "', '" + message.getText() + "', "
+                + message.getNumberOfReceptions() + ", " + message.getNumberOfReads()
+                + ", " + message.getMessageStatus().ordinal() + ", " + message.getIdSender()
                 + ", " + message.getIdThread() + ")";
+
+
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
