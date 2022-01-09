@@ -1,6 +1,10 @@
 package serveurGUI;
 
+import server.Server;
+
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -14,18 +18,19 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-public class ServeurCreerGroupe {
+public class NewGroupGUI {
+    private Server server;
+
     // Components
     private JFrame frame;
     private JPanel mainPanel;
     private JPanel centerPanel;
 
-    public ServeurCreerGroupe() {
-
-        build();
+    public NewGroupGUI(Server server) {
+        this.server = server;
     }
 
-    private void build() {
+    public void build() {
         setMainFrame();
         frame.setVisible(true);
     }
@@ -97,6 +102,12 @@ public class ServeurCreerGroupe {
         centerPanel.setLayout(groupLayout);
         mainPanel.add(centerPanel, BorderLayout.CENTER);
 
+        validerButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String name = groupNameTextField.getText();
+                //TODO continuer
+            }
+        });
     }
 
     private void buildMainPanel() {
@@ -104,14 +115,10 @@ public class ServeurCreerGroupe {
         mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         mainPanel.setLayout(new BorderLayout());
         buildCenterPanel();
-        JLabel titleLabel = new JLabel("Cr\u00E9er un nouveau groupe");
+        JLabel titleLabel = new JLabel("Créer un nouveau groupe");
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(titleLabel, BorderLayout.NORTH);
 
-    }
-
-    public static void main(String[] args) {
-        ServeurCreerGroupe g = new ServeurCreerGroupe();
 
     }
 }

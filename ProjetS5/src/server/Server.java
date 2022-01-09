@@ -3,6 +3,7 @@ package server;
 import object.*;
 import client.ClientInterface;
 import object.Thread;
+import serveurGUI.NewGroupGUI;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
@@ -17,7 +18,7 @@ public class Server implements ServerInterface {
     private Map<Long, ClientInterface> connectedUsersMap = new HashMap<>();
     private DatabaseInteraction database = new DatabaseInteraction();
 
-    public static void main(String[] args) {
+    public void main() {
         try {
             int port = 5099;
             Registry registry = LocateRegistry.createRegistry(port);
@@ -25,6 +26,8 @@ public class Server implements ServerInterface {
             registry.bind("ServerInterface", stub);
             System.err.println("Serveur lancé\n\tAdresse IP : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tPort : 5099\n");
+            NewGroupGUI newGroupGUI = new NewGroupGUI(this);
+            newGroupGUI.build();
             //TODO appeler la fct pour l'affichage
         } catch (Exception e) {
             System.err.println("Erreur lancement serveur : " + e);

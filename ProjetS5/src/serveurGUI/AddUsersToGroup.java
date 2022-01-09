@@ -35,6 +35,7 @@ public class AddUsersToGroup {
     }
 
     private void setFrame() {
+        /*
         User[] listUser = new User[2];
         Box box = Box.createVerticalBox();
         // int size = server.getAllUser().size();
@@ -55,7 +56,7 @@ public class AddUsersToGroup {
 
         frame.add(scrollPane, BorderLayout.CENTER);
         frame.add(validerButton, BorderLayout.SOUTH);
-
+        */
     }
 
     public static void main(String[] args) {

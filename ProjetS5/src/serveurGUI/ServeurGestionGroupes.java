@@ -213,39 +213,6 @@ public class ServeurGestionGroupes {
     }
 
     private void setTest() {
-        CampusUser user = new CampusUser(1, "Sabrina", "Sikder", "caca");
-        CampusUser user2 = new CampusUser(2, "Hugo", "Deleye", "zizi");
-        Group student = new Group(0, "Étudiant");
-        Group grp1 = new Group(1, "TDA1");
-        Group grp2 = new Group(2, "TDA2");
-        Group grp3 = new Group(3, "TDA3");
-        Group grp4 = new Group(4, "TDA4");
-        Group grp5 = new Group(5, "TDA5");
-        user.addGroup(grp1);
-        grp1.addUser(user);
-        grp1.addUser(user2);
-        user2.addGroup(grp1);
-        user.addGroup(student);
-        student.addUser(user);
-        user2.addGroup(grp2);
-        grp2.addUser(user2);
-        user2.addGroup(student);
-        student.addUser(user2);
-        Thread th1 = new Thread(1, "J'ai des soucis avec Christine Sénac", user, grp4);
-        grp4.addThread(th1);
-        user.addThread(th1);
-        th1.addMessage(new Message(1, new Date(), user, "Christine arrête pas de m'embeter", th1));
-        Thread th2 = new Thread(2, "caca", user, student);
-        student.addThread(th2);
-
-        th2.addMessage(new Message(2, new Date(), user, "J'ai fait caca sur une des tables de l'U3-03 !", th2));
-
-        Thread th3 = new Thread(3, "title title title title title title title title title", user2, grp1);
-        grp1.addThread(th3);
-        th3.addMessage(new Message(3, new Date(), user2,
-                "Je ne savais pas quoi mettre comme titre du coup j'ai mis ça mais je suis pas sûr du titre", th3));
-
-        currentGroup = grp1;
     }
 
     public static void main(String[] args) {
