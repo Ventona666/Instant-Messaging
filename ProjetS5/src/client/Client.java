@@ -1,6 +1,6 @@
 package client;
 
-import com.mysql.cj.log.Log;
+import clientGUI.ClientGUI;
 import object.*;
 import object.Thread;
 import server.ConnexionRefusedException;
@@ -12,10 +12,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.NavigableSet;
-import java.util.Scanner;
 
 public class Client implements ClientInterface{
     private User user = null;
+    private ClientGUI clientGUI = null;
     private static final int clientPort = 5098;
     private static final int serverPort = 5099;
     private static final String serverIp = "192.168.68.101"; // A changer selon le serveur utilisé
@@ -64,6 +64,9 @@ public class Client implements ClientInterface{
             System.err.println("Erreur lors de la tentative de connexion : " + remoteException);
             remoteException.printStackTrace();
         }
+
+        clientGUI = new ClientGUI(this);
+        clientGUI.build();
     }
 
     public void logOut(){
@@ -144,11 +147,13 @@ public class Client implements ClientInterface{
     @Override
     public void inCommingMessage(Message message) throws RemoteException {
         // Update local du thread
+        System.out.println("lalala");
         long idThread = message.getIdThread();
         for(Group group : user.getGroupSet()){
             for(Thread thread : group.getThreadSet()){
                 if(thread.getId() == idThread){
                     thread.addMessage(message);
+                    clientGUI.updateInterface();
                     break;
                 }
             }
@@ -158,6 +163,7 @@ public class Client implements ClientInterface{
     @Override
     public void addToANewGroup(Group group) throws RemoteException {
         user.addGroup(group);
+        clientGUI.updateInterface();
     }
 
     @Override
@@ -169,6 +175,7 @@ public class Client implements ClientInterface{
                 for(Thread t : g.getThreadSet()){
                     if(t.equals(thread)){
                         t.setMessageList(thread.getMessageList());
+                        clientGUI.updateInterface();
                         break;
                     }
                 }

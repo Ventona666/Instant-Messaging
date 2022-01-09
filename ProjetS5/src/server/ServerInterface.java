@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
 import java.util.NavigableSet;
 
 public interface ServerInterface extends Remote {
-    void register(long idUser) throws RemoteException;
+    void register(User user) throws RemoteException;
     void unregister(long idUser) throws RemoteException;
     void sendMessage(Message message) throws RemoteException;
     void hasRead(long userId, long messageId) throws RemoteException;

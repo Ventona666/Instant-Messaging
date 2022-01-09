@@ -1,4 +1,4 @@
-package client;
+package clientGUI;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -19,6 +19,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
+import client.Client;
 import object.Group;
 import object.User;
 import object.Thread;

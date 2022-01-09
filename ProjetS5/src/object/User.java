@@ -65,7 +65,6 @@ public abstract class User implements Serializable, Comparable<User> {
     }
 
     public TreeMap<Group, TreeSet<Thread>> getAllThread(){
-        /*
         TreeMap<Group, TreeSet<Thread>> groupThreadTreeMap = new TreeMap<>();
         TreeSet<Thread> threadTreeSet = new TreeSet<>();;
         for(Group g : groupSet){
@@ -74,8 +73,7 @@ public abstract class User implements Serializable, Comparable<User> {
             threadTreeSet = new TreeSet<>();
         }
         groupThreadTreeMap.putAll(groupThreadSetMap);
-        return groupThreadTreeMap;*/
-        return null;
+        return groupThreadTreeMap;
     }
 
     public void sendMessage(String text, Thread thread){

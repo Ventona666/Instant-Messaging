@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class Server implements ServerInterface {
-    private Map<Long, ClientInterface> connectedUsersMap = new HashMap<>();
+    private Map<User, ClientInterface> connectedUsersMap = new HashMap<>();
     private DatabaseInteraction database = new DatabaseInteraction();
 
     public void main() {
@@ -37,21 +37,20 @@ public class Server implements ServerInterface {
     }
 
     @Override
-    public void register(long idUser) throws RemoteException {
+    public void register(User user) throws RemoteException {
         try {
             String host = RemoteServer.getClientHost();
             Registry registry = LocateRegistry.getRegistry(host, 5098);
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
 
             stubClient.ping();
-            connectedUsersMap.put(idUser, stubClient);
+            connectedUsersMap.put(user, stubClient);
 
-            User user = database.getUser(idUser, false);
             TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = user.getAllThread();
 
             for(Group group : groupTreeSetTreeMap.keySet()){
                 for(Thread thread : groupTreeSetTreeMap.get(group)){
-                    Message lastMessageReceived = database.getReceive(idUser, thread.getId());
+                    Message lastMessageReceived = database.getReceive(user.getId(), thread.getId());
 
                     for(Message message : thread.getMessageList().tailSet(lastMessageReceived, false)){
                         message.incrementNumberOfReceptions(group.getNumberOfMember());
@@ -87,9 +86,7 @@ public class Server implements ServerInterface {
         long idGroup = thread.getIdGroup();
         Group virtualGroup = database.getGroup(idGroup, false);
         virtualGroup.addUser(thread.getOwner());
-
-        //TODO méthode pour replace le thread dans la bdd
-
+        database.newMessage(message);
         for(User user : virtualGroup.getUserSet()){
             if(connectedUsersMap.containsKey(user)){
                 try {

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,13 +28,10 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import client.Client;
-import client.NewThreadGUI;
-import clientGUI.UserInfoGUI;
 import object.Group;
 import object.Message;
 import object.MessageStatus;
@@ -274,7 +270,7 @@ public class ClientGUI {
         }
     }
 
-    private void updateTree() {
+    public void updateInterface() {
         // TODO: METTRE A JOUR LES THREADS SI NOUVEAU MESSAGE A VOIR SI FONCTION FAITE
         // DANS CLIENT
         updateMessageTable();

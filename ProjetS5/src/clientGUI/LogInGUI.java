@@ -103,7 +103,7 @@ public class LogInGUI {
         User user = client.getUser();
         // Enregistrement comme client activement connecté auprès du serveur
         try{
-            user.getStubServer().register(user.getId());
+            user.getStubServer().register(user);
             System.err.println("Enregistrement auprès du serveur réussi");
         }catch (Exception e){
             System.err.println("Erreur lors de l'enregistrement auprès du serveur : " + e);
@@ -125,8 +125,6 @@ public class LogInGUI {
                     client.logIn(username, password);
                     register();
                     frame.dispose();
-                    ClientGUI clientGUI = new ClientGUI(client);
-                    clientGUI.build();
                 } catch (ConnexionRefusedException connexionRefusedException){
                     //TODO afficher un message graphique
                     System.err.println("Username et/ou mot de passe incorrect : " + connexionRefusedException);
