@@ -1,4 +1,4 @@
-package server;
+package serveurGUI;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 import object.CampusUser;
 import object.Group;
+import server.Server;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;

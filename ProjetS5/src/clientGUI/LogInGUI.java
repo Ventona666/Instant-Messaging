@@ -1,6 +1,6 @@
-package client;
+package clientGUI;
 
-import com.mysql.cj.log.Log;
+import client.Client;
 import object.User;
 import server.ConnexionRefusedException;
 

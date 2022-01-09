@@ -1,8 +1,6 @@
 package client;
 
-import object.User;
-
-import java.awt.event.WindowListener;
+import clientGUI.LogInGUI;
 
 public class ClientManager {
     //Classe permettant de gérer la partie graphique et la partie connexion

@@ -1,4 +1,4 @@
-package client;
+package clientGUI;
 
 import java.awt.BorderLayout;
 
@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import client.Client;
 import object.Group;
 import object.Thread;
 import object.User;

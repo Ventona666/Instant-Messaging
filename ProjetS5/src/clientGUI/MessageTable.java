@@ -1,4 +1,4 @@
-package client;
+package clientGUI;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;

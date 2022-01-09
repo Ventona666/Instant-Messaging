@@ -1,4 +1,4 @@
-package client;
+package clientGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -29,6 +29,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import client.Client;
 import object.Group;
 import object.Message;
 import object.Thread;
