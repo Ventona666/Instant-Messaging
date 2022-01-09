@@ -46,7 +46,7 @@ public class Server implements ServerInterface {
             stubClient.ping();
             connectedUsersMap.put(idUser, stubClient);
 
-            User user = database.getUser(idUser);
+            User user = database.getUser(idUser, false);
             TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = user.getAllThread();
 
             for(Group group : groupTreeSetTreeMap.keySet()){
@@ -81,11 +81,11 @@ public class Server implements ServerInterface {
     @Override
     public void sendMessage(Message message) throws RemoteException {
         long idThread = message.getIdThread();
-        Thread thread = database.getThread(idThread);
+        Thread thread = database.getThread(idThread, false);
 
         /// Création d'un groupe virtuel afin d'envoyer le message à tout les users du thread
         long idGroup = thread.getIdGroup();
-        Group virtualGroup = database.getGroup(idGroup);
+        Group virtualGroup = database.getGroup(idGroup, false);
         virtualGroup.addUser(thread.getOwner());
 
         //TODO méthode pour replace le thread dans la bdd
@@ -112,8 +112,8 @@ public class Server implements ServerInterface {
     @Override
     public void hasRead(long userId, long messageId) throws RemoteException {
         Message message = database.getMessage(messageId);
-        Thread thread = database.getThread(message.getIdThread());
-        Group group = database.getGroup(thread.getIdGroup());
+        Thread thread = database.getThread(message.getIdThread(), false);
+        Group group = database.getGroup(thread.getIdGroup(), false);
 
         message.incrementNumberOfReads(group.getNumberOfMember());
         database.updateRead(userId, messageId);
@@ -135,7 +135,7 @@ public class Server implements ServerInterface {
     public void newThread(Thread thread) throws RemoteException {
         database.newThread(thread);
         long idGroup = thread.getIdGroup();
-        Group virtualGroup = database.getGroup(idGroup);
+        Group virtualGroup = database.getGroup(idGroup, false);
         virtualGroup.addUser(thread.getOwner());
         for(User user : virtualGroup.getUserSet()){
             if(connectedUsersMap.containsKey(user)){
@@ -152,7 +152,7 @@ public class Server implements ServerInterface {
 
     @Override
     public void closeThread(int idThread) throws RemoteException {
-        Thread thread = database.getThread(idThread);
+        Thread thread = database.getThread(idThread, false);
         thread.closeThread();
         //TODO update bdd
     }
@@ -200,7 +200,7 @@ public class Server implements ServerInterface {
 
     @Override
     public Group getGroup(long idGroup) throws RemoteException {
-        return database.getGroup(idGroup);
+        return database.getGroup(idGroup, false);
     }
 
     @Override

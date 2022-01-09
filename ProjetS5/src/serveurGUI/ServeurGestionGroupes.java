@@ -52,7 +52,6 @@ public class ServeurGestionGroupes {
     public ServeurGestionGroupes(Server server) {
         this.server = server;
         setTest();
-        build();
     }
 
     private void buildComponents() {
@@ -116,7 +115,7 @@ public class ServeurGestionGroupes {
         try{
             NavigableSet<Group> groupNavigableSet = server.getAllGroup();
             for (Group group : groupNavigableSet) {
-                DefaultMutableTreeNode groupTemp =  new DefaultMutableTreeNode(group.getName());
+                DefaultMutableTreeNode groupTemp =  new DefaultMutableTreeNode(group);
                 groups.add(groupTemp);
                 currentGroup = group;
             }

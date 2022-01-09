@@ -1,4 +1,4 @@
-package client;
+package clientGUI;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -32,6 +32,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import client.Client;
 import object.Group;
 import object.Message;
 import object.Thread;
@@ -188,7 +189,6 @@ public class ClientGUI {
             public void mouseClicked(MouseEvent e) {
                 new NewThreadGUI(client.getUser()).build();
             }
-
         });
         imgNewThread.add(iconLabel);
         addIcon = new ImageIcon(ClassLoader.getSystemResource("client/user.png"));
@@ -198,7 +198,6 @@ public class ClientGUI {
             public void mouseClicked(MouseEvent e) {
                 new UserInfoGUI(client.getUser()).build();
             }
-
         });
         imgUserInfo.add(iconLabel);
         addIcon = new ImageIcon(ClassLoader.getSystemResource("client/logout.png"));
@@ -208,7 +207,6 @@ public class ClientGUI {
             public void mouseClicked(MouseEvent e) {
                 client.logOut();
             }
-
         });
         imgLogOut.add(iconLabel);*/
     }

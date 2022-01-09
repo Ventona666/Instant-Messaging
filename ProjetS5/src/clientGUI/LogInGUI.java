@@ -1,7 +1,6 @@
 package clientGUI;
 
 import client.Client;
-import client.ClientGUI;
 import object.User;
 import server.ConnexionRefusedException;
 

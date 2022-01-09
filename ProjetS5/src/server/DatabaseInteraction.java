@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
-import com.sun.source.tree.Tree;
 import object.CampusUser;
 import object.Group;
 import object.Message;
@@ -72,7 +71,7 @@ public class DatabaseInteraction {
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
             if (passwordEnter.equals(rs.getString("passwordUser")))
-                return getUser(rs.getLong("idUser"));
+                return getUser(rs.getLong("idUser"), false);
             else
                 throw new ConnexionRefusedException("Identifiant ou mot de passe invalide");
         } catch (SQLException e) {
@@ -81,20 +80,22 @@ public class DatabaseInteraction {
         }
     }
 
-    public Thread getThread(long idThread) {
+    public Thread getThread(long idThread, boolean b) {
         String req = "SELECT * FROM ThreadT WHERE idThread=" + idThread;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
             long idGroup = rs.getLong("idGroup");
-            User user = getUser(rs.getLong("idUser"));
+            User user = getUser(rs.getLong("idUser"), false);
             return new Thread(idThread, rs.getString("titleThread"), user, idGroup);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
     }
+
+
 
     public void newThread(Thread thread) {
         String req = "INSERT INTO ThreadT VALUES (" + thread.getId() + ", '" + thread.getTitle() + "', "
@@ -221,7 +222,7 @@ public class DatabaseInteraction {
         }
     }
 
-    public User getUser(long idUser) {
+    public User getUser(long idUser, boolean isDegenerated) {
         User user;
         String req = "SELECT * FROM UserT WHERE idUser=" + idUser;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
@@ -235,8 +236,12 @@ public class DatabaseInteraction {
                 user = new CampusUser(idUser, firstName, lastName, username);
             else
                 user = new StaffUser(idUser, firstName, lastName, username);
-            user.setGroupSet(getGroupUser(idUser));
-            user.setGroupThreadSetMap(getThreadOwner(idUser));
+
+            if(!isDegenerated){
+                user.setGroupSet(getGroupUser(idUser), true);
+                user.setGroupThreadSetMap(getThreadOwner(idUser, true));
+            }
+
             return user;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -292,7 +297,7 @@ public class DatabaseInteraction {
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next()) {
-                listGroup.add(getGroup(rs.getLong("idGroup")));
+                listGroup.add(getGroup(rs.getLong("idGroup"), true));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -307,7 +312,7 @@ public class DatabaseInteraction {
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next()) {
-                listGroup.add(getGroup(rs.getLong("idGroup")));
+                listGroup.add(getGroup(rs.getLong("idGroup"), false));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -322,7 +327,7 @@ public class DatabaseInteraction {
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next()) {
-                listUser.add(getUser(rs.getLong("idUser")));
+                listUser.add(getUser(rs.getLong("idUser"), false));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -330,7 +335,7 @@ public class DatabaseInteraction {
         return listUser;
     }
 
-    public Group getGroup(long idGroup) {
+    public Group getGroup(long idGroup, boolean isDegenerated) {
         String req = "SELECT * FROM GroupT WHERE idGroup=" + idGroup;
         // id name user thread
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
@@ -338,12 +343,15 @@ public class DatabaseInteraction {
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
             String name = rs.getString("nameGroup");
-            int numberOfMember = rs.getInt("numberOfMember");
+            int numberOfMember = 0; //rs.getInt("numberOfMember");
             Group group = new Group(idGroup, name, numberOfMember);
-            for (User u : getUserGroup(idGroup))
-                group.addUser(u);
-            for (Thread t : getThreadGroup(idGroup))
-                group.addThread(t);
+            if(!isDegenerated){
+                for (User u : getUserGroup(idGroup, true))
+                    group.addUser(u);
+                for (Thread t : getThreadGroup(idGroup, true))
+                    group.addThread(t);
+            }
+
             return group;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -351,14 +359,15 @@ public class DatabaseInteraction {
         }
     }
 
-    private NavigableSet<User> getUserGroup(long idGroup) {
+
+    private NavigableSet<User> getUserGroup(long idGroup, boolean isDegenerated) {
         String req = "SELECT idUser FROM MemberT WHERE idGroup=" + idGroup;
         NavigableSet<User> listUser = new TreeSet<>();
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next())
-                listUser.add(getUser(rs.getLong("idUser")));
+                listUser.add(getUser(rs.getLong("idUser"), isDegenerated));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -378,21 +387,21 @@ public class DatabaseInteraction {
         return -1;
     }
 
-    private NavigableSet<Thread> getThreadGroup(long idGroup) {
+    private NavigableSet<Thread> getThreadGroup(long idGroup, boolean isDegerated) {
         String req = "SELECT idThread FROM ThreadT WHERE idGroup=" + idGroup;
         NavigableSet<Thread> listThread = new TreeSet<>();
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next())
-                listThread.add(getThread(rs.getLong("idGroup")));
+                listThread.add(getThread(rs.getLong("idGroup"), isDegerated));
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return listThread;
     }
 
-    private TreeMap<Group, TreeSet<Thread>> getThreadOwner(long idUser){
+    private TreeMap<Group, TreeSet<Thread>> getThreadOwner(long idUser, boolean isDegenerated){
         //Permet de récuperer tout les threads créé par un user
         String req = "SELECT idThread FROM ThreadT WHERE idUser=" + idUser;
         TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = new TreeMap<>();
@@ -401,8 +410,8 @@ public class DatabaseInteraction {
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next()) {
-                Thread thread = getThread(rs.getLong("idGroup"));
-                Group group = getGroup(thread.getIdGroup());
+                Thread thread = getThread(rs.getLong("idGroup"), isDegenerated);
+                Group group = getGroup(thread.getIdGroup(), isDegenerated);
                 if(!groupTreeSetTreeMap.containsKey(group)){
                     threadTreeSet = new TreeSet<>();
                 }
@@ -419,15 +428,15 @@ public class DatabaseInteraction {
     }
 
     public boolean uniqueIdUser(long idUser) {
-        return getUser(idUser) == null;
+        return getUser(idUser, false) == null;
     }
 
     public boolean uniqueIdGroup(long idGroup) {
-        return getGroup(idGroup) == null;
+        return getGroup(idGroup, false) == null;
     }
 
     public boolean uniqueIdThread(long idThread) {
-        return getThread(idThread) == null;
+        return getThread(idThread, false) == null;
     }
 
     public boolean uniqueIdMessage(long idMessage) {
