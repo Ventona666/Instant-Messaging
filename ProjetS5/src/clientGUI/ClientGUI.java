@@ -1,6 +1,7 @@
 package clientGUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -8,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -29,12 +29,15 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import client.Client;
+import clientGUI.NewThreadGUI;
 import object.Group;
 import object.Message;
+import object.MessageStatus;
 import object.Thread;
 
 public class ClientGUI {
@@ -70,6 +73,7 @@ public class ClientGUI {
         buildTree();
         buildScrollPane();
         buildLeftPanel();
+        buildIcons();
         buildBottomRightPanel();
         buildMessageTable();
         buildRightPanel();
@@ -129,7 +133,7 @@ public class ClientGUI {
             public void actionPerformed(ActionEvent e) {
                 String message = textArea.getText();
                 client.getUser().sendMessage(message, currentThread);
-                textArea.setText(""); // Pour enlever le contenu du text area
+                textArea.setText("");
             }
         });
     }
@@ -156,72 +160,96 @@ public class ClientGUI {
     private void buildTree() {
         DefaultMutableTreeNode groups = new DefaultMutableTreeNode("Groupes");
         TreeMap<Group, TreeSet<Thread>> threadList = client.getUser().getAllThread();
-        for (Group group : threadList.keySet()) {
-            DefaultMutableTreeNode groupTemp = new DefaultMutableTreeNode(group.getName());
-            if (!threadList.get(group).isEmpty())
-                groups.add(groupTemp);
-            for (Thread thread : threadList.get(group)) {
-                DefaultMutableTreeNode threadTemp = new DefaultMutableTreeNode(thread.getTitle());
-                threadTemp.setUserObject(thread);
-                groupTemp.add(threadTemp);
+        if(threadList != null){
+            for (Group group : threadList.keySet()) {
+                DefaultMutableTreeNode groupTemp = new DefaultMutableTreeNode(group.getName());
+                if (!threadList.get(group).isEmpty())
+                    groups.add(groupTemp);
+                for (Thread thread : threadList.get(group)) {
+                    DefaultMutableTreeNode threadTemp = new DefaultMutableTreeNode(thread.getTitle());
+                    threadTemp.setUserObject(thread);
+                    groupTemp.add(threadTemp);
+                }
             }
+            threadTree = new JTree(groups);
+            threadTree.addTreeSelectionListener(new TreeSelectionListener() {
+                public void valueChanged(TreeSelectionEvent e) {
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) threadTree.getLastSelectedPathComponent();
+                    if (node == null || !node.isLeaf())
+                        return;
+                    currentThread = (Thread) node.getUserObject();
+                    updateMessageTableNewThread();
+                }
+            });
         }
-        threadTree = new JTree(groups);
-        threadTree.addTreeSelectionListener(new TreeSelectionListener() {
-            public void valueChanged(TreeSelectionEvent e) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) threadTree.getLastSelectedPathComponent();
-                if (node == null || !node.isLeaf())
-                    return;
-                currentThread = (Thread) node.getUserObject();
-                updateMessageTableNewThread();
-            }
-        });
+
     }
 
     private void buildIcons() {
-        /*
-        ImageIcon addIcon;
-        JLabel iconLabel;
-        addIcon = new ImageIcon(ClassLoader.getSystemResource("client/plus.png"));
-        iconLabel = new JLabel(addIcon);
-        iconLabel.addMouseListener(new MouseAdapter() {
+        JButton addButton = new JButton("+");
+        addButton.addActionListener(new ActionListener() {
+
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
+
                 new NewThreadGUI(client.getUser()).build();
             }
         });
-        imgNewThread.add(iconLabel);
-        addIcon = new ImageIcon(ClassLoader.getSystemResource("client/user.png"));
-        iconLabel = new JLabel(addIcon);
-        iconLabel.addMouseListener(new MouseAdapter() {
+
+        imgNewThread.add(addButton);
+
+        JButton userInfoButton = new JButton("infos");
+        userInfoButton.addActionListener(new ActionListener() {
+
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 new UserInfoGUI(client.getUser()).build();
+
             }
         });
-        imgUserInfo.add(iconLabel);
-        addIcon = new ImageIcon(ClassLoader.getSystemResource("client/logout.png"));
-        iconLabel = new JLabel(addIcon);
-        iconLabel.addMouseListener(new MouseAdapter() {
+
+        imgUserInfo.add(userInfoButton);
+
+        JButton logoutButton = new JButton("logout");
+        logoutButton.addActionListener(new ActionListener() {
+
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 client.logOut();
+
             }
         });
-        imgLogOut.add(iconLabel);*/
+
+        imgLogOut.add(logoutButton);
     }
 
     private void buildMessageTable() {
         String[] columns = { "", "" };
         messageModel = new DefaultTableModel(columns, 0);
         messageTable = new JTable(messageModel);
-
-
+        messageTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int colSelec = messageTable.getSelectedColumn();
+                int rowSelec = messageTable.getSelectedRow();
+                Message currentMessage = (Message) messageTable.getModel().getValueAt(rowSelec, colSelec);
+                MessageStatus status = currentMessage.getMessageStatus();
+                Color cellColor = Color.WHITE;
+                if (status.equals(MessageStatus.READ_BY_ALL_USERS))
+                    cellColor = Color.GREEN;
+                if (status.equals(MessageStatus.RECEIVED_BY_ALL_USERS))
+                    cellColor = Color.ORANGE;
+                if (status.equals(MessageStatus.RECEIVED_BY_SERVER))
+                    cellColor = Color.RED;
+                messageTable.setSelectionBackground(cellColor);
+            }
+        });
     }
 
     private void setPositionMessage(Message currentMessage) {
         Message messageRight = null;
         Message messageLeft = null;
+        currentMessage.setNameSender(client.getUser().toString());
         if (currentMessage.getId() == client.getUser().getId())
             messageLeft = currentMessage;
         else
@@ -246,12 +274,10 @@ public class ClientGUI {
         }
     }
 
-    private void buildMessageStyle() {
-
-    }
-
     private void updateTree() {
-        // CHANGER L'ARBRE SI NOUVEAU MESSAGE OU NOUVEAU THREAD
+        // TODO: METTRE A JOUR LES THREADS SI NOUVEAU MESSAGE A VOIR SI FONCTION FAITE
+        // DANS CLIENT
+        updateMessageTable();
     }
 
     public void build() {

@@ -1,4 +1,4 @@
-package clientGUI;
+package client;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -19,18 +19,13 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
-import client.Client;
 import object.Group;
-import object.Thread;
 import object.User;
+import object.Thread;
 
 public class NewThreadGUI {
+
     private Client client;
-
-    public NewThreadGUI(Client client){
-        this.client = client;
-    }
-
     private User user;
 
     // Components
@@ -48,8 +43,9 @@ public class NewThreadGUI {
     private JButton cancelButton;
     private JPanel centerPanel;
 
-    public NewThreadGUI(User user) {
-        this.user = user;
+    public NewThreadGUI(Client client) {
+        this.client = client;
+        user = client.getUser();
     }
 
     private void buildComponents() {
@@ -82,11 +78,10 @@ public class NewThreadGUI {
         messageLabel = new JLabel("Message");
         threadField = new JTextField();
         threadField.setColumns(20);
-
         Group[] listGroup = new Group[user.getGroupSet().size()];
         listGroup = user.getGroupSet().toArray(listGroup);
         groupComboBox = new JComboBox<>(listGroup);
-
+        groupComboBox.getSelectedItem();
         messageTextArea = new JTextArea();
         messageTextArea.setLineWrap(true);
         messagePane = new JScrollPane(messageTextArea);
@@ -102,11 +97,16 @@ public class NewThreadGUI {
         });
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String title = threadField.getText();
-                Group group = (Group) groupComboBox.getSelectedItem();
-                String message = messageTextArea.getText();
-                Thread thread = client.getUser().newThread(title, group);
-                client.getUser().sendMessage(message, thread);
+                newButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String title = threadField.getText();
+                        Group group = (Group) groupComboBox.getSelectedItem();
+                        String message = messageTextArea.getText();
+                        Thread thread = client.getUser().newThread(title, group);
+                        client.getUser().sendMessage(message, thread);
+                    }
+                });
+
             }
         });
     }

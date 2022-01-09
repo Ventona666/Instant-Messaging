@@ -20,7 +20,7 @@ public class NewGroupGUI {
     private Server server;
 
     // Components
-    private JFrame frame;
+    private JFrame frame = new JFrame("Gestion des groupe");
     private JPanel mainPanel;
     private JPanel centerPanel;
     private JLabel userSelectedLabel;
@@ -38,13 +38,16 @@ public class NewGroupGUI {
     }
 
     private void setMainFrame() {
-        frame = new JFrame("Gestion des groupe");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(526, 529);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         buildMainPanel();
         frame.setContentPane(mainPanel);
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     private void buildCenterPanel() {

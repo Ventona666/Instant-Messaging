@@ -3,22 +3,12 @@ package serveurGUI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.Date;
 import java.util.NavigableSet;
 
-import javax.swing.GroupLayout;
+import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTree;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -48,10 +38,10 @@ public class ServeurGestionGroupes {
     private JLabel groupListLabel;
     private JPanel topRightPanel;
     private JComboBox comboBox;
+    private JButton addButton;
 
     public ServeurGestionGroupes(Server server) {
         this.server = server;
-        setTest();
     }
 
     private void buildComponents() {
@@ -140,8 +130,6 @@ public class ServeurGestionGroupes {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
     }
 
     private void buildTopLeftPanel() {
@@ -149,8 +137,8 @@ public class ServeurGestionGroupes {
         topLeftPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         groupListLabel = new JLabel("Liste des groupes");
         topLeftPanel.add(groupListLabel);
-        iconPanel = new JPanel();
-        topLeftPanel.add(iconPanel);
+        addButton = new JButton ("+");
+        topLeftPanel.add(addButton);
     }
 
     private void buildTopRightPanel() {
@@ -215,12 +203,57 @@ public class ServeurGestionGroupes {
         bottomRightPanel.setLayout(groupLayout);
         rightPanel.add(bottomRightPanel, BorderLayout.CENTER);
 
-
         choisirUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ServeurListUser serveurListUser = new ServeurListUser(server, currentGroup);
+                serveurListUser.getFrame().addWindowListener(new WindowAdapter() {
+                    public void windowClosed(WindowEvent ev) {
+                        buildRightPanel();
+                        buildBottomRightPanel();
+                        buildTopRightPanel();
+                        splitPane.setRightComponent(rightPanel);
+                    }
+                });
                 serveurListUser.buildFrame();
+            }
+        });
+
+        supprimerMembreButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                User user = (User) comboBox.getSelectedItem();
+                try{
+                    server.removeFromGroup(user, currentGroup);
+                    System.err.println("L'utilisateur a bien été supprimé");
+                    JFrame jFrameConfirmation = new JFrame();
+                    JOptionPane.showMessageDialog(jFrameConfirmation, "L'utilisateur " + user.toString()
+                            + " a bien été supprimé du groupe " + currentGroup.getName());
+                    buildRightPanel();
+                    buildBottomRightPanel();
+                    buildTopRightPanel();
+                    splitPane.setRightComponent(rightPanel);
+                } catch(Exception exception){
+                    System.err.println("Erreur lors de la suppression de l'utilisateur " + exception);
+                    exception.printStackTrace();
+                }
+
+            }
+        });
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NewGroupGUI newGroupGUI = new NewGroupGUI(server);
+                newGroupGUI.getFrame().addWindowListener(new WindowAdapter() {
+                    public void windowClosed(WindowEvent ev) {
+                        buildTree();
+                        buildScrollPane();
+                        buildLeftPanel();
+                        splitPane.setLeftComponent(leftPanel);
+                    }
+                });
+                newGroupGUI.build();
             }
         });
     }
@@ -235,21 +268,6 @@ public class ServeurGestionGroupes {
         User[] listeMembre = new User[size];
         listeMembre = currentGroup.getUserSet().toArray(listeMembre);
         comboBox = new JComboBox<>(listeMembre);
-
     }
 
-    private void setActionListeners() {
-        comboBox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-    }
-
-    private void setTest() {
-    }
 }

@@ -18,7 +18,7 @@ public class ServeurListUser {
     private Group group;
     private Server server;
     // Components
-    private JFrame frame;
+    private JFrame frame = new JFrame("Ajouter un utilisateur dans le groupe");
     private JScrollPane scrollPane;
     private JButton ajouterButton;
 
@@ -32,7 +32,6 @@ public class ServeurListUser {
     }
 
     public void buildFrame() {
-        frame = new JFrame("Ajouter un utilisateur dans le groupe");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setMinimumSize(new Dimension(400, 500));
         frame.setLocationRelativeTo(null);
@@ -64,6 +63,10 @@ public class ServeurListUser {
                     try{
                         server.addToGroup(userSelected, group);
                         System.err.println("L'utilisateur a bien été ajouté au groupe");
+                        JFrame jFrameConfirmation = new JFrame();
+                        JOptionPane.showMessageDialog(jFrameConfirmation, "L'utilisateur " +
+                                userSelected.toString() + " a été ajouté au groupe " + group.getName());
+                        frame.dispose();
                     } catch (Exception exception){
                         System.err.println("Erreur lors de l'ajout de l'utilisateur : " + exception);
                         exception.printStackTrace();

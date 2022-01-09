@@ -1,10 +1,11 @@
 package object;
 
+import java.io.Serializable;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import static utils.IdGenerator.idGenerator;
 
-public class Thread implements Comparable<Thread> {
+public class Thread implements Serializable, Comparable<Thread> {
     private final long id;
     private final String title;
     private final User owner;

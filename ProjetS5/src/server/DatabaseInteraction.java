@@ -288,6 +288,9 @@ public class DatabaseInteraction {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        for(User user : group.getUserSet()){
+            newMember(user, group);
+        }
     }
 
     private NavigableSet<Group> getGroupUser(long idUser) {

@@ -2,10 +2,11 @@ package object;
 
 import utils.IdGenerator;
 
+import java.io.Serializable;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
-public class Group implements Comparable<Group> {
+public class Group implements Serializable, Comparable<Group> {
     private final long id;
     private final String name;
     private final NavigableSet<User> userSet = new TreeSet<>();
@@ -71,5 +72,10 @@ public class Group implements Comparable<Group> {
     @Override
     public int compareTo(Group group) {
         return name.compareTo(group.getName());
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

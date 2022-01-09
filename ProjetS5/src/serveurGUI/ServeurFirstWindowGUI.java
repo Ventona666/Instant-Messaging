@@ -40,9 +40,16 @@ public class ServeurFirstWindowGUI {
 
 		JButton gestionUtilisateurButton = new JButton("G\u00E9rer les utilisateurs");
 		gestionUtilisateurButton.setFont(gestionUtilisateurButton.getFont().deriveFont(34.0f));
+		gestionUtilisateurButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				NewUserGUI newUserGUI = new NewUserGUI(server);
+				newUserGUI.build();
+				frame.dispose();
+			}
+		});
+
 		frame.add(gestionUtilisateurButton);
 		frame.setVisible(true);
-
 	}
 
 }

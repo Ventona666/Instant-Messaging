@@ -64,7 +64,7 @@ public class ThreadMemberGUI extends JFrame {
     private void buildCenterPanel() {
         centerPanel = new JPanel();
         long idGroup = thread.getIdGroup();
-        try{
+        try {
             Group group = client.getUser().getStubServer().getGroup(idGroup);
             System.err.println("Groupe obtenu avec succès");
 
@@ -75,7 +75,7 @@ public class ThreadMemberGUI extends JFrame {
             JScrollPane scrollPane = new JScrollPane(userJList);
             centerPanel.add(scrollPane);
             mainPane.add(centerPanel, BorderLayout.CENTER);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Erreur lors de l'obtention du groupe : " + e);
             e.printStackTrace();
         }

@@ -13,6 +13,7 @@ public class Message implements Serializable, Comparable<Message> {
     private final long idThread;
     private int numberOfReceptions = 0;
     private int numberOfReads = 0;
+    private String nameSender;
     private MessageStatus messageStatus = MessageStatus.DEFAULT;
 
     public Message(Date date, long idSender, String text, long thread) {
@@ -51,9 +52,14 @@ public class Message implements Serializable, Comparable<Message> {
         return idSender;
     }
 
+    public void setNameSender(String nameSender) {
+        this.nameSender = nameSender;
+    }
+
+
     @Override
     public String toString() {
-        return text;
+        return nameSender + "\n\n" + text + "\n\n" + date;
     }
 
     public MessageStatus getMessageStatus() {
