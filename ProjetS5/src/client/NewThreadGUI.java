@@ -21,9 +21,11 @@ import javax.swing.border.EmptyBorder;
 
 import object.Group;
 import object.User;
+import object.Thread;
 
 public class NewThreadGUI {
 
+    private Client client;
     private User user;
 
     // Components
@@ -41,8 +43,9 @@ public class NewThreadGUI {
     private JButton cancelButton;
     private JPanel centerPanel;
 
-    public NewThreadGUI(User user) {
-        this.user = user;
+    public NewThreadGUI(Client client) {
+        this.client = client;
+        user = client.getUser();
     }
 
     private void buildComponents() {
@@ -94,7 +97,16 @@ public class NewThreadGUI {
         });
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // TODO NEW THREAD
+                newButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String title = threadField.getText();
+                        Group group = (Group) groupComboBox.getSelectedItem();
+                        String message = messageTextArea.getText();
+                        Thread thread = client.getUser().newThread(title, group);
+                        client.getUser().sendMessage(message, thread);
+                    }
+                });
+
             }
         });
     }

@@ -188,7 +188,7 @@ public class ClientGUI {
         iconLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new NewThreadGUI(client.getUser()).build();
+                new NewThreadGUI(client).build();
             }
 
         });
