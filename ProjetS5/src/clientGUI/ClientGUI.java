@@ -34,7 +34,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import client.Client;
-import clientGUI.NewThreadGUI;
+import client.NewThreadGUI;
+import clientGUI.UserInfoGUI;
 import object.Group;
 import object.Message;
 import object.MessageStatus;
@@ -182,7 +183,6 @@ public class ClientGUI {
                 }
             });
         }
-
     }
 
     private void buildIcons() {
@@ -192,7 +192,7 @@ public class ClientGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                new NewThreadGUI(client.getUser()).build();
+                new NewThreadGUI(client).build();
             }
         });
 

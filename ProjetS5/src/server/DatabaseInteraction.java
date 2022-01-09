@@ -80,22 +80,21 @@ public class DatabaseInteraction {
         }
     }
 
-    public Thread getThread(long idThread, boolean b) {
-        String req = "SELECT * FROM ThreadT WHERE idThread=" + idThread;
+    public Thread getThread(long idThread, boolean isDegenerated) {
+        String req = "SELECT idGroup, idUser, titleThread FROM ThreadT WHERE idThread=" + idThread;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
             long idGroup = rs.getLong("idGroup");
-            User user = getUser(rs.getLong("idUser"), false);
+            User user = getUser(rs.getLong("idUser"), true);
             return new Thread(idThread, rs.getString("titleThread"), user, idGroup);
+
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
-
-
 
     public void newThread(Thread thread) {
         String req = "INSERT INTO ThreadT VALUES (" + thread.getId() + ", '" + thread.getTitle() + "', "
@@ -390,14 +389,14 @@ public class DatabaseInteraction {
         return -1;
     }
 
-    private NavigableSet<Thread> getThreadGroup(long idGroup, boolean isDegerated) {
+    private NavigableSet<Thread> getThreadGroup(long idGroup, boolean isDegenerated) {
         String req = "SELECT idThread FROM ThreadT WHERE idGroup=" + idGroup;
         NavigableSet<Thread> listThread = new TreeSet<>();
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next())
-                listThread.add(getThread(rs.getLong("idGroup"), isDegerated));
+                listThread.add(getThread(rs.getLong("idGroup"), isDegenerated));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -406,14 +405,14 @@ public class DatabaseInteraction {
 
     private TreeMap<Group, TreeSet<Thread>> getThreadOwner(long idUser, boolean isDegenerated){
         //Permet de récuperer tout les threads créé par un user
-        String req = "SELECT idThread FROM ThreadT WHERE idUser=" + idUser;
+        String req = "SELECT idThread, idGroup FROM ThreadT WHERE idUser=" + idUser;
         TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = new TreeMap<>();
         TreeSet<Thread> threadTreeSet;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             while (rs.next()) {
-                Thread thread = getThread(rs.getLong("idGroup"), isDegenerated);
+                Thread thread = getThread(rs.getLong("idThread"), isDegenerated);
                 Group group = getGroup(thread.getIdGroup(), isDegenerated);
                 if(!groupTreeSetTreeMap.containsKey(group)){
                     threadTreeSet = new TreeSet<>();
