@@ -1,6 +1,7 @@
 package clientGUI;
 
 import client.Client;
+import client.ClientGUI;
 import object.User;
 import server.ConnexionRefusedException;
 
@@ -111,6 +112,7 @@ public class LogInGUI {
         }
     }
     private void buildButton() {
+
         connectButton = new JButton("Se connecter");
         GridBagConstraints gbcConnectButton = new GridBagConstraints();
         gbcConnectButton.insets = new Insets(0, 0, 0, 5);

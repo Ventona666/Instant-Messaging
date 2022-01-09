@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
+import java.util.NavigableSet;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -19,6 +20,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import object.CampusUser;
@@ -46,7 +49,8 @@ public class ServeurGestionGroupes {
     private JPanel topRightPanel;
     private JComboBox comboBox;
 
-    public ServeurGestionGroupes() {
+    public ServeurGestionGroupes(Server server) {
+        this.server = server;
         setTest();
         build();
     }
@@ -106,14 +110,39 @@ public class ServeurGestionGroupes {
     }
 
     private void buildTree() {
-        DefaultMutableTreeNode groups = new DefaultMutableTreeNode("Groupes");
-        /*
-         * for (Group group : server.getAllGroup()) { DefaultMutableTreeNode groupTemp =
-         * new DefaultMutableTreeNode(group.getName()); groups.add(groupTemp); }
-         */
-        groupTree = new JTree(groups);
 
-        // TODO selection listener
+        DefaultMutableTreeNode groups = new DefaultMutableTreeNode("Groupes");
+
+        try{
+            NavigableSet<Group> groupNavigableSet = server.getAllGroup();
+            for (Group group : groupNavigableSet) {
+                DefaultMutableTreeNode groupTemp =  new DefaultMutableTreeNode(group.getName());
+                groups.add(groupTemp);
+                currentGroup = group;
+            }
+
+            groupTree = new JTree(groups);
+
+            groupTree.addTreeSelectionListener(new TreeSelectionListener() {
+                @Override
+                public void valueChanged(TreeSelectionEvent e) {
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) groupTree.getLastSelectedPathComponent();
+                    if (node == null || !node.isLeaf())
+                        return;
+                    currentGroup = (Group) node.getUserObject();
+                    buildRightPanel();
+                    buildBottomRightPanel();
+                    buildTopRightPanel();
+                    splitPane.setRightComponent(rightPanel);
+
+                }
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
     }
 
     private void buildTopLeftPanel() {
@@ -186,6 +215,15 @@ public class ServeurGestionGroupes {
 
         bottomRightPanel.setLayout(groupLayout);
         rightPanel.add(bottomRightPanel, BorderLayout.CENTER);
+
+
+        choisirUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ServeurListUser serveurListUser = new ServeurListUser(server, currentGroup);
+                serveurListUser.buildFrame();
+            }
+        });
     }
 
     public void build() {
@@ -210,14 +248,9 @@ public class ServeurGestionGroupes {
 
             }
         });
+
     }
 
     private void setTest() {
     }
-
-    public static void main(String[] args) {
-        ServeurGestionGroupes s = new ServeurGestionGroupes();
-
-    }
-
 }

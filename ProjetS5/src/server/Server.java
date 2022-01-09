@@ -3,9 +3,7 @@ package server;
 import object.*;
 import client.ClientInterface;
 import object.Thread;
-import serveurGUI.AddUsersToGroup;
-import serveurGUI.NewGroupGUI;
-import serveurGUI.NewUserGUI;
+import serveurGUI.*;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
@@ -28,11 +26,10 @@ public class Server implements ServerInterface {
             registry.bind("ServerInterface", stub);
             System.err.println("Serveur lancé\n\tAdresse IP : " + Inet4Address.getLocalHost().getHostAddress() +
                     "\n\tPort : 5099\n");
-            //NewGroupGUI newGroupGUI = new NewGroupGUI(this);
-            //newGroupGUI.build();
-            NewUserGUI newUserGUI = new NewUserGUI(this);
-            newUserGUI.build();
-            //TODO appeler la fct pour l'affichage
+
+            ServeurFirstWindowGUI serveurFirstWindowGUI = new ServeurFirstWindowGUI(this);
+            serveurFirstWindowGUI.build();
+
         } catch (Exception e) {
             System.err.println("Erreur lancement serveur : " + e);
             e.printStackTrace();
@@ -216,8 +213,9 @@ public class Server implements ServerInterface {
         group.addUser(user);
         database.newMember(user, group);
         ClientInterface stubClient = connectedUsersMap.get(user);
-
-        stubClient.addToANewGroup(group);
+        if(stubClient != null){
+            stubClient.addToANewGroup(group);
+        }
     }
 
     @Override

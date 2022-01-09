@@ -331,7 +331,7 @@ public class DatabaseInteraction {
     }
 
     public Group getGroup(long idGroup) {
-        String req = "SELECT * FROM GroupT WHERE id=" + idGroup;
+        String req = "SELECT * FROM GroupT WHERE idGroup=" + idGroup;
         // id name user thread
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
