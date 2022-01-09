@@ -1,34 +1,32 @@
 package serveurGUI;
 
+import object.Group;
 import object.User;
 import server.Server;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.NavigableSet;
 
-import javax.swing.GroupLayout;
+import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 public class NewGroupGUI {
     private Server server;
-    private NewGroupGUI newGroupGUISelf = this;
 
     // Components
     private JFrame frame;
     private JPanel mainPanel;
     private JPanel centerPanel;
     private JLabel userSelectedLabel;
-    private User[] listSelectedUser;
+    JList<User> selectedUser;
+    JScrollPane scrollPane = new JScrollPane();
+    private NavigableSet<User> listSelectedUser;
 
     public NewGroupGUI(Server server) {
         this.server = server;
@@ -49,16 +47,6 @@ public class NewGroupGUI {
         frame.setContentPane(mainPanel);
     }
 
-    public void setListSelectedUser(User[] listSelectedUser) {
-        this.listSelectedUser = listSelectedUser;
-        StringBuilder selectedUser = new StringBuilder();
-        for(User user : listSelectedUser){
-            selectedUser.append(user.toString());
-            selectedUser.append('\n');
-        }
-        userSelectedLabel.setText(selectedUser.toString());
-    }
-
     private void buildCenterPanel() {
         centerPanel = new JPanel();
 
@@ -72,18 +60,10 @@ public class NewGroupGUI {
 
         JButton choisirUserButton = new JButton("Choisir les utilisateurs");
 
-        choisirUserButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                AddUsersToGroup addUsersToGroup = new AddUsersToGroup(server, newGroupGUISelf);
-                addUsersToGroup.buildFrame();
-            }
-        });
-
         userSelectedLabel = new JLabel("Utilisateurs s\u00E9lectionn\u00E9s");
 
         JButton validerButton = new JButton("Valider");
 
-        JScrollPane scrollPane = new JScrollPane();
         GroupLayout groupLayout = new GroupLayout(centerPanel);
         groupLayout
                 .setHorizontalGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -126,9 +106,48 @@ public class NewGroupGUI {
         validerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String name = groupNameTextField.getText();
-                //TODO continuer
+                Group group = new Group(name);
+                for(User user : listSelectedUser){
+                    group.addUser(user);
+                }
+                try{
+                    server.createGroup(group);
+                    System.err.println("Groupe ajouté avec succès dans la base de donnée");
+                    JFrame jFrameConfirmation = new JFrame();
+                    JOptionPane.showMessageDialog(jFrameConfirmation, "Le groupe " + name + " à bien été créé.");
+                } catch (Exception exception){
+                    System.err.println("Erreur lors de l'ajout dans la base de donnée : " + exception);
+                    exception.printStackTrace();
+                }
+                frame.dispose();
             }
         });
+
+        choisirUserButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                AddUsersToGroup addUsersToGroup = new AddUsersToGroup(server);
+                addUsersToGroup.getFrame().addWindowListener(new WindowAdapter() {
+                    public void windowClosed(WindowEvent ev) {
+                        listSelectedUser = addUsersToGroup.getListSelectedUser();
+                        User[] userList = new User[listSelectedUser.size()];
+
+                        int i = 0;
+                        for(User user : listSelectedUser){
+                            userList[i] = user;
+                            i++;
+                        }
+
+                        selectedUser = new JList<>(userList);
+                        JScrollPane scrollPaneTemp = new JScrollPane(selectedUser);
+                        groupLayout.replace(scrollPane, scrollPaneTemp);
+                        scrollPane = scrollPaneTemp;
+                    }
+                });
+
+                addUsersToGroup.buildFrame();
+            }
+        });
+
     }
 
     private void buildMainPanel() {

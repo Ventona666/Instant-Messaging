@@ -18,7 +18,7 @@ public class Client implements ClientInterface{
     private User user = null;
     private static final int clientPort = 5098;
     private static final int serverPort = 5099;
-    private static final String serverIp = "192.168.68.102"; // A changer selon le serveur utilisé
+    private static final String serverIp = "192.168.68.101"; // A changer selon le serveur utilisé
     private static ServerInterface stubServer;
 
     public void connectingToServer(){

@@ -5,6 +5,7 @@ import client.ClientInterface;
 import object.Thread;
 import serveurGUI.AddUsersToGroup;
 import serveurGUI.NewGroupGUI;
+import serveurGUI.NewUserGUI;
 
 import java.net.Inet4Address;
 import java.rmi.RemoteException;
@@ -29,8 +30,8 @@ public class Server implements ServerInterface {
                     "\n\tPort : 5099\n");
             //NewGroupGUI newGroupGUI = new NewGroupGUI(this);
             //newGroupGUI.build();
-            NewGroupGUI newGroupGUI = new NewGroupGUI(this);
-            newGroupGUI.build();
+            NewUserGUI newUserGUI = new NewUserGUI(this);
+            newUserGUI.build();
             //TODO appeler la fct pour l'affichage
         } catch (Exception e) {
             System.err.println("Erreur lancement serveur : " + e);

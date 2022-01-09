@@ -3,8 +3,7 @@ package serveurGUI;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import object.CampusUser;
@@ -12,20 +11,12 @@ import object.Group;
 import server.Server;
 
 import java.awt.GridBagLayout;
-import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 
 public class NewUserGUI extends JFrame {
     private Server server;
@@ -185,13 +176,22 @@ public class NewUserGUI extends JFrame {
                 String lastName = lastNameField.getText();
                 String password = pwdLabel.getText();
                 String userType = typeLabel.getText();
-                if(userType.equals("Campus User")){
-                    username = server.createAccount(firstName, lastName, password, false);
+                if(!firstName.equals("") && !lastName.equals("") && !password.equals("")) {
+                    if (userType.equals("Campus User")) {
+                        username = server.createAccount(firstName, lastName, password, false);
+                    } else {
+                        username = server.createAccount(firstName, lastName, password, true);
+                    }
+                    JFrame jFrameConfirmation = new JFrame();
+                    JOptionPane.showMessageDialog(jFrameConfirmation,
+                            "Le compte a bien été créé. Le nom d'utilisateur est : " + username);
+                    frame.dispose();
                 }
                 else{
-                    username = server.createAccount(firstName, lastName, password, true);
+                    JFrame jFrameErreur = new JFrame();
+                    JOptionPane.showMessageDialog(jFrameErreur,
+                            "Complétez tous les champs !");
                 }
-                // TODO afficher un message pour donner le username + confirmer la creation du compte
             }
         });
 

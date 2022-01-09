@@ -3,9 +3,7 @@ package serveurGUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -13,7 +11,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import object.CampusUser;
 import object.Group;
 import object.User;
 import server.Server;
@@ -21,21 +18,18 @@ import server.Server;
 public class AddUsersToGroup {
 
     private Server server;
-    private NewGroupGUI newGroupGUI;
     private Group group;
     // Components
-    private JFrame frame;
+    private JFrame frame = new JFrame("Ajouter les utlisateurs dans le nouveau groupe");
     private JScrollPane scrollPane;
     private JButton validerButton;
-    private User[] listSelectedUser;
+    private NavigableSet<User> listSelectedUser = new TreeSet<>();
 
-    public AddUsersToGroup(Server server, NewGroupGUI newGroupGUI){
+    public AddUsersToGroup(Server server){
         this.server = server;
-        this.newGroupGUI = newGroupGUI;
     }
 
     public void buildFrame() {
-        frame = new JFrame("Ajouter les utlisateurs dans le nouveau groupe");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setMinimumSize(new Dimension(450, 500));
         frame.setLocationRelativeTo(null);
@@ -44,35 +38,29 @@ public class AddUsersToGroup {
         frame.setVisible(true);
     }
 
-    public User[] getListSelectedUser() {
+    public NavigableSet<User> getListSelectedUser() {
         return listSelectedUser;
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     private void setFrame() {
         JCheckBox temp;
-        User[] listUser;
-
         Map<User, JCheckBox> jCheckBoxUserMap = new TreeMap<>();
-        int size = 0;
         Box box = Box.createVerticalBox();
+
         try{
-            size = server.getAllUser().size();
-            listUser = new User[size];
-            listSelectedUser = new User[size];
-            listUser = server.getAllUser().toArray(listUser);
-            for (int i = 0; i < size; i++) {
-                temp = new JCheckBox(listUser[i].toString());
-                jCheckBoxUserMap.put(listUser[i], temp);
+            NavigableSet<User> userSet = server.getAllUser();
+            for(User user : userSet){
+                temp = new JCheckBox(user.toString());
+                jCheckBoxUserMap.put(user, temp);
                 box.add(temp);
             }
-
-
-
         } catch (Exception e){
             e.printStackTrace();
         }
-
-
 
         scrollPane = new JScrollPane(box, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -80,15 +68,11 @@ public class AddUsersToGroup {
 
         validerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int i = 0;
                 for(User user : jCheckBoxUserMap.keySet()){
                     if(jCheckBoxUserMap.get(user).isSelected()){
-                        listSelectedUser[i] = user;
-                        i++;
+                        listSelectedUser.add(user);
                     }
                 }
-                Sys.out
-                newGroupGUI.setListSelectedUser(listSelectedUser);
                 frame.dispose();
             }
         });
