@@ -271,8 +271,10 @@ public class ClientGUI {
     }
 
     public void updateInterface() {
-        // TODO: METTRE A JOUR LES THREADS SI NOUVEAU MESSAGE A VOIR SI FONCTION FAITE
-        // DANS CLIENT
+        buildTree();
+        buildScrollPane();
+        buildLeftPanel();
+        splitPane.setLeftComponent(leftPanel);
         updateMessageTable();
     }
 
@@ -280,5 +282,4 @@ public class ClientGUI {
         setMainFrame();
         frame.setVisible(true);
     }
-
 }

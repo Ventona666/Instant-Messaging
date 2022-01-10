@@ -79,8 +79,8 @@ public class NewThreadGUI {
         messageLabel = new JLabel("Message");
         threadField = new JTextField();
         threadField.setColumns(20);
-        Group[] listGroup = new Group[user.getGroupSet().size()];
-        listGroup = user.getGroupSet().toArray(listGroup);
+        Group[] listGroup = new Group[client.getAllGroup().size()];
+        listGroup = client.getAllGroup().toArray(listGroup);
         groupComboBox = new JComboBox<>(listGroup);
         groupComboBox.getSelectedItem();
         messageTextArea = new JTextArea();
@@ -98,16 +98,12 @@ public class NewThreadGUI {
         });
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                newButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        String title = threadField.getText();
-                        Group group = (Group) groupComboBox.getSelectedItem();
-                        String message = messageTextArea.getText();
-                        Thread thread = client.getUser().newThread(title, group);
-                        client.getUser().sendMessage(message, thread);
-                    }
-                });
-
+                String title = threadField.getText();
+                Group group = (Group) groupComboBox.getSelectedItem();
+                String message = messageTextArea.getText();
+                Thread thread = client.getUser().newThread(title, group);
+                client.getUser().sendMessage(message, thread);
+                frame.dispose();
             }
         });
     }

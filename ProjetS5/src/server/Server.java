@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class Server implements ServerInterface {
-    private Map<User, ClientInterface> connectedUsersMap = new HashMap<>();
+    private Map<Long, ClientInterface> connectedUsersMap = new HashMap<>();
     private DatabaseInteraction database = new DatabaseInteraction();
 
     public void main() {
@@ -44,7 +44,7 @@ public class Server implements ServerInterface {
             ClientInterface stubClient = (ClientInterface) registry.lookup("ClientInterface");
 
             stubClient.ping();
-            connectedUsersMap.put(user, stubClient);
+            connectedUsersMap.put(user.getId(), stubClient);
 
             TreeMap<Group, TreeSet<Thread>> groupTreeSetTreeMap = user.getAllThread();
 
@@ -87,10 +87,11 @@ public class Server implements ServerInterface {
         Group virtualGroup = database.getGroup(idGroup, false);
         virtualGroup.addUser(thread.getOwner());
         database.newMessage(message);
+
         for(User user : virtualGroup.getUserSet()){
-            if(connectedUsersMap.containsKey(user)){
+            if(connectedUsersMap.containsKey(user.getId())){
                 try {
-                    connectedUsersMap.get(user).inCommingMessage(message);
+                    connectedUsersMap.get(user.getId()).inCommingMessage(message);
                     message.incrementNumberOfReceptions(virtualGroup.getNumberOfMember());
                     if(message.getNumberOfReceptions() == virtualGroup.getNumberOfMember()){
                         for(ClientInterface stubClient : connectedUsersMap.values()){
