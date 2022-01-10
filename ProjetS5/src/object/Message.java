@@ -59,7 +59,7 @@ public class Message implements Serializable, Comparable<Message> {
 
     @Override
     public String toString() {
-        return nameSender + "\n\n" + text + "\n\n" + date;
+        return nameSender + " : " + text + " - " + date;
     }
 
     public MessageStatus getMessageStatus() {
@@ -104,6 +104,4 @@ public class Message implements Serializable, Comparable<Message> {
     public int compareTo(Message message) {
         return date.compareTo(message.getDate());
     }
-
-
 }

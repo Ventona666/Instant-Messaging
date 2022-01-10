@@ -254,11 +254,9 @@ public class ClientGUI {
     }
 
     private void updateMessageTable() {
-        System.out.println(currentThread.toString());
         List<Message> messageList = new ArrayList<>(currentThread.getMessageList());
         for (Iterator<Message> it = messageList.listIterator(messageModel.getRowCount()); it.hasNext();) {
             Message currentMessage = it.next();
-
             setPositionMessage(currentMessage);
         }
     }

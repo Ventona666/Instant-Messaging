@@ -139,7 +139,6 @@ public class Client implements ClientInterface{
     @Override
     public void inCommingMessage(Message message) throws RemoteException {
         // Update local du thread
-        System.out.println("Reception du message : " + message.getText());
         long idThread = message.getIdThread();
         clientGUI.updateInterface();
         for(Group group : user.getGroupSet()){
