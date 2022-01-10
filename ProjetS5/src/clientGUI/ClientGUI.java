@@ -266,6 +266,7 @@ public class ClientGUI {
             messageModel.removeRow(i);
         }
         for (Message currentMessage : currentThread.getMessageList()) {
+            System.out.println(currentMessage.toString());
             setPositionMessage(currentMessage);
         }
     }

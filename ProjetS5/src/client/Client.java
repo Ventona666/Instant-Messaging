@@ -111,13 +111,6 @@ public class Client implements ClientInterface{
         return user;
     }
 
-    /*
-    public static void main(String[] args) {
-        bootingClientRegistry();
-        connectingToServer();
-    }*/
-
-
     /* Méthodes utilisées uniquement par le serveur */
 
 
