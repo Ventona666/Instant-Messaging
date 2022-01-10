@@ -81,6 +81,20 @@ public class DatabaseInteraction {
         }
     }
 
+    private NavigableSet<Message> getThreadMessage(long idThread) {
+        String req = "SELECT idMessage FROM MessageT WHERE idThread=" + idThread;
+        NavigableSet<Message> listMessage = new TreeSet<>();
+        try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(req);) {
+            while (rs.next())
+                listMessage.add(getMessage(rs.getLong("idMessage")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listMessage;
+    }
+
     public Thread getThread(long idThread, boolean isDegenerated) {
         String req = "SELECT idGroup, idUser, titleThread FROM ThreadT WHERE idThread=" + idThread;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
@@ -89,8 +103,9 @@ public class DatabaseInteraction {
             rs.next();
             long idGroup = rs.getLong("idGroup");
             User user = getUser(rs.getLong("idUser"), true);
-            return new Thread(idThread, rs.getString("titleThread"), user, idGroup);
-
+            Thread thread = new Thread(idThread, rs.getString("titleThread"), user, idGroup);
+            thread.setMessageList(getThreadMessage(idThread));
+            return thread;
         } catch (SQLException e) {
             e.printStackTrace();
         }

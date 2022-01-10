@@ -272,6 +272,7 @@ public class ClientGUI {
     }
 
     public void updateInterface() {
+        System.out.println("LA !!!!");
         buildTree();
         buildScrollPane();
         buildLeftPanel();

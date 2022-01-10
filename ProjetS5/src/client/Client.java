@@ -15,7 +15,7 @@ import java.util.NavigableSet;
 
 public class Client implements ClientInterface{
     private User user = null;
-    private ClientGUI clientGUI = null;
+    private ClientGUI clientGUI = new ClientGUI(this);
     private static final int clientPort = 5098;
     private static final int serverPort = 5099;
     private static final String serverIp = "192.168.68.101"; // A changer selon le serveur utilisé
@@ -65,7 +65,6 @@ public class Client implements ClientInterface{
             remoteException.printStackTrace();
         }
 
-        clientGUI = new ClientGUI(this);
         clientGUI.build();
     }
 
@@ -140,13 +139,13 @@ public class Client implements ClientInterface{
     @Override
     public void inCommingMessage(Message message) throws RemoteException {
         // Update local du thread
-        System.out.println("lalala");
+        System.out.println("Reception du message : " + message.toString());
         long idThread = message.getIdThread();
+        clientGUI.updateInterface();
         for(Group group : user.getGroupSet()){
             for(Thread thread : group.getThreadSet()){
                 if(thread.getId() == idThread){
                     thread.addMessage(message);
-                    clientGUI.updateInterface();
                     break;
                 }
             }

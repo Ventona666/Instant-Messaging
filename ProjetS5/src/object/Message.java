@@ -102,11 +102,7 @@ public class Message implements Serializable, Comparable<Message> {
 
     @Override
     public int compareTo(Message message) {
-        if (date.before(message.getDate())) {
-            return -1;
-        } else {
-            return 1;
-        }
+        return date.compareTo(message.getDate());
     }
 
 
