@@ -87,8 +87,13 @@ public class DatabaseInteraction {
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
-            while (rs.next())
-                listMessage.add(getMessage(rs.getLong("idMessage")));
+            while (rs.next()){
+                Message message = getMessage(rs.getLong("idMessage"));
+                if(message != null){
+                    listMessage.add(message);
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -124,12 +129,12 @@ public class DatabaseInteraction {
     }
 
     public Message getMessage(long idMessage) {
-        String req = "SELECT * FROM MessageT WHERE id=" + idMessage;
+        String req = "SELECT * FROM MessageT WHERE idMessage=" + idMessage;
         try (Connection con = DriverManager.getConnection(dbUrl, DB_USER, DB_PASS);
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(req);) {
             rs.next();
-            long idSender = rs.getLong("idSender");
+            long idSender = rs.getLong("idUser");
             long idThread = rs.getLong("idThread");
             Message message = new Message(idMessage, new Date(rs.getTimestamp("dateMessage").getTime()), idSender, rs.getString("textMessage"), idThread);
             message.setMessageStatus(MessageStatus.values()[rs.getInt("statusMessage")]);
